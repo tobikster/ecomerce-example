@@ -7,5 +7,6 @@ import org.springframework.boot.runApplication
 class OrderServiceApplication
 
 fun main(args: Array<String>) {
+	@Suppress("SpreadOperator")
 	runApplication<OrderServiceApplication>(*args)
 }
