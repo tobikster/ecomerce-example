@@ -1,9 +1,9 @@
 plugins {
-    kotlin("jvm") version "2.3.21"
-    kotlin("plugin.spring") version "2.3.21"
-    id("org.springframework.boot") version "4.1.1"
-    id("io.spring.dependency-management") version "1.1.7"
-    kotlin("plugin.jpa") version "2.3.21"
+	alias(libs.plugins.kotlin.jvm)
+	alias(libs.plugins.kotlin.spring)
+	alias(libs.plugins.spring.boot)
+	alias(libs.plugins.spring.dependencyManagement)
+	alias(libs.plugins.kotlin.jpa)
 }
 
 group = "com.example"
@@ -21,19 +21,19 @@ repositories {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-webmvc")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("tools.jackson.module:jackson-module-kotlin")
+	implementation(libs.spring.boot.starter.actuator)
+	implementation(libs.spring.boot.starter.web)
+	implementation(libs.kotlin.reflect)
+	implementation(libs.jackson.kotlin)
 
-	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-	implementation("org.springframework.boot:spring-boot-starter-flyway")
-	implementation("org.flywaydb:flyway-database-postgresql")
-	runtimeOnly("org.postgresql:postgresql")
+	implementation(libs.spring.boot.starter.jpa)
+	implementation(libs.spring.boot.starter.flyway)
+	implementation(libs.flyway.postgresql)
+	runtimeOnly(libs.postgresql)
 
-    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	testImplementation(libs.spring.boot.starter.web.test)
+	testImplementation(libs.kotlin.junit5)
+	testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 kotlin {
