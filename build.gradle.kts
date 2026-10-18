@@ -34,14 +34,24 @@ dependencies {
 	implementation(libs.flyway.postgresql)
 	runtimeOnly(libs.postgresql)
 
-	testImplementation(libs.spring.boot.starter.web.test)
+	testImplementation(platform(libs.testcontainers.bom))
 	testImplementation(libs.kotlin.junit5)
+	testImplementation(libs.kotest.assertions)
+	testImplementation(libs.spring.boot.starter.data.jpa.test)
+	testImplementation(libs.spring.boot.starter.test)
+	testImplementation(libs.spring.boot.testcontainers)
+	testImplementation(libs.testcontainers.junit)
+	testImplementation(libs.testcontainers.postgresql)
 	testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 kotlin {
 	compilerOptions {
-		freeCompilerArgs.addAll("-Xjsr305=strict", "-Xannotation-default-target=param-property")
+		freeCompilerArgs.addAll(
+			"-Xjsr305=strict",
+			"-Xannotation-default-target=param-property",
+			"-Xconsistent-data-class-copy-visibility",
+		)
 	}
 }
 
