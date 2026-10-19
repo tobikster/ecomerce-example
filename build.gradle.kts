@@ -31,14 +31,17 @@ dependencies {
 
 	implementation(libs.spring.boot.starter.jpa)
 	implementation(libs.spring.boot.starter.flyway)
+	implementation(libs.spring.boot.starter.validation)
 	implementation(libs.flyway.postgresql)
 	runtimeOnly(libs.postgresql)
 
 	testImplementation(platform(libs.testcontainers.bom))
-	testImplementation(libs.kotlin.junit5)
 	testImplementation(libs.kotest.assertions)
+	testImplementation(libs.kotlin.junit5)
+	testImplementation(libs.mockito.kotlin)
 	testImplementation(libs.spring.boot.starter.data.jpa.test)
 	testImplementation(libs.spring.boot.starter.test)
+	testImplementation(libs.spring.boot.starter.webmvc.test)
 	testImplementation(libs.spring.boot.testcontainers)
 	testImplementation(libs.testcontainers.junit)
 	testImplementation(libs.testcontainers.postgresql)

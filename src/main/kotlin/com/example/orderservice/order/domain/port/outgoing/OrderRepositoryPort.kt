@@ -1,4 +1,4 @@
-package com.example.orderservice.order.domain.port.out
+package com.example.orderservice.order.domain.port.outgoing
 
 import com.example.orderservice.order.domain.model.Order
 import com.example.orderservice.order.domain.model.OrderId

@@ -1,5 +1,6 @@
 package com.example.orderservice.order.domain.model
 
+import java.math.BigDecimal
 import java.time.Instant
 import java.util.UUID
 
@@ -16,14 +17,18 @@ data class Order private constructor(
 			customerId: CustomerId,
 			totalAmount: Money,
 			now: Instant = Instant.now(),
-		) = Order(
-			id = OrderId(UUID.randomUUID()),
-			customerId = customerId,
-			totalAmount = totalAmount,
-			status = OrderStatus.CREATED,
-			createdAt = now,
-			updatedAt = now,
-		)
+		): Order {
+			if (totalAmount.amount <= BigDecimal.ZERO) throw OrderException.InvalidAmount(totalAmount.amount)
+
+			return Order(
+				id = OrderId(UUID.randomUUID()),
+				customerId = customerId,
+				totalAmount = totalAmount,
+				status = OrderStatus.CREATED,
+				createdAt = now,
+				updatedAt = now,
+			)
+		}
 
 		@Suppress("LongParameterList")
 		fun restore(

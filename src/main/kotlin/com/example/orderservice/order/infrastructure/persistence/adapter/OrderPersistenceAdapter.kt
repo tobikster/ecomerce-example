@@ -2,7 +2,7 @@ package com.example.orderservice.order.infrastructure.persistence.adapter
 
 import com.example.orderservice.order.domain.model.Order
 import com.example.orderservice.order.domain.model.OrderId
-import com.example.orderservice.order.domain.port.out.OrderRepositoryPort
+import com.example.orderservice.order.domain.port.outgoing.OrderRepositoryPort
 import com.example.orderservice.order.infrastructure.persistence.entity.OrderEntity
 import com.example.orderservice.order.infrastructure.persistence.mapper.toDomain
 import com.example.orderservice.order.infrastructure.persistence.mapper.toEntity
