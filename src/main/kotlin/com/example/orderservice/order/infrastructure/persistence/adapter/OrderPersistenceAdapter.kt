@@ -1,5 +1,6 @@
 package com.example.orderservice.order.infrastructure.persistence.adapter
 
+import com.example.orderservice.order.domain.model.CustomerId
 import com.example.orderservice.order.domain.model.Order
 import com.example.orderservice.order.domain.model.OrderId
 import com.example.orderservice.order.domain.port.outgoing.OrderRepositoryPort
@@ -21,4 +22,14 @@ class OrderPersistenceAdapter(
 			.findById(id.value)
 			.map(OrderEntity::toDomain)
 			.getOrNull()
+
+	override fun findByCustomerId(customerId: CustomerId) =
+		repository
+			.findAllByCustomerId(customerId.value)
+			.map(OrderEntity::toDomain)
+
+	override fun findDistinctCustomerIds() =
+		repository
+			.findDistinctCustomerIds()
+			.map(::CustomerId)
 }

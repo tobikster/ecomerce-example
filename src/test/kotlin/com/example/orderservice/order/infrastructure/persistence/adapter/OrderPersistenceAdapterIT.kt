@@ -6,6 +6,9 @@ import com.example.orderservice.order.domain.model.OrderId
 import com.example.orderservice.order.domain.model.OrderStatus
 import com.example.orderservice.order.domain.model.of
 import com.example.orderservice.order.infrastructure.persistence.entity.OrderEntity
+import io.kotest.inspectors.shouldForAll
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
@@ -96,6 +99,85 @@ class OrderPersistenceAdapterIT
 
 			// Then
 			result.shouldBeNull()
+		}
+
+		@Test
+		fun `should find orders of a customer from database`() {
+			// Given
+			val orders =
+				listOf(
+					OrderEntity(
+						id = UUID.randomUUID(),
+						customerId = "customer_999",
+						totalAmount = "50.00".toBigDecimal(),
+						currency = Currency.getInstance("PLN"),
+						status = OrderStatus.CREATED,
+						createdAt = Instant.now(),
+						updatedAt = Instant.now(),
+					),
+					OrderEntity(
+						id = UUID.randomUUID(),
+						customerId = "customer_123",
+						totalAmount = "24.99".toBigDecimal(),
+						currency = Currency.getInstance("EUR"),
+						status = OrderStatus.COMPLETED,
+						createdAt = Instant.now(),
+						updatedAt = Instant.now(),
+					),
+				)
+			orders.forEach(entityManager::persist)
+			entityManager.flush()
+
+			// When
+			val customerOrders = adapter.findByCustomerId(CustomerId("customer_123"))
+
+			// Then
+			customerOrders shouldHaveSize 1
+			customerOrders.shouldForAll {
+				it.customerId.value shouldBe "customer_123"
+			}
+		}
+
+		@Test
+		fun `should return distinct customers`() {
+			// Given
+			listOf(
+				OrderEntity(
+					id = UUID.randomUUID(),
+					customerId = "customer_999",
+					totalAmount = "50.00".toBigDecimal(),
+					currency = Currency.getInstance("PLN"),
+					status = OrderStatus.CREATED,
+					createdAt = Instant.now(),
+					updatedAt = Instant.now(),
+				),
+				OrderEntity(
+					id = UUID.randomUUID(),
+					customerId = "customer_123",
+					totalAmount = "24.99".toBigDecimal(),
+					currency = Currency.getInstance("EUR"),
+					status = OrderStatus.COMPLETED,
+					createdAt = Instant.now(),
+					updatedAt = Instant.now(),
+				),
+				OrderEntity(
+					id = UUID.randomUUID(),
+					customerId = "customer_999",
+					totalAmount = "150.00".toBigDecimal(),
+					currency = Currency.getInstance("PLN"),
+					status = OrderStatus.CANCELLED,
+					createdAt = Instant.now(),
+					updatedAt = Instant.now(),
+				),
+			).forEach(entityManager::persist)
+			entityManager.flush()
+
+			// When
+			val customers = adapter.findDistinctCustomerIds()
+
+			// Then
+			customers shouldHaveSize 2
+			customers shouldContainExactlyInAnyOrder listOf(CustomerId("customer_999"), CustomerId("customer_123"))
 		}
 
 		companion object {

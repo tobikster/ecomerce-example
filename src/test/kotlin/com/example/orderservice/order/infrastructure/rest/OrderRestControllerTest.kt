@@ -3,20 +3,29 @@ package com.example.orderservice.order.infrastructure.rest
 import com.example.orderservice.order.domain.model.CustomerId
 import com.example.orderservice.order.domain.model.Order
 import com.example.orderservice.order.domain.model.OrderException
+import com.example.orderservice.order.domain.model.OrderId
+import com.example.orderservice.order.domain.model.OrderStatus
 import com.example.orderservice.order.domain.model.of
 import com.example.orderservice.order.domain.port.incoming.CreateOrderUseCase
-import com.example.orderservice.order.infrastructure.rest.dto.CreateOrderRequest
+import com.example.orderservice.order.domain.port.incoming.GetCustomerOrdersQuery
+import com.example.orderservice.order.domain.port.incoming.GetCustomerOrdersUseCase
+import com.example.orderservice.order.domain.port.incoming.GetCustomersUseCase
+import com.example.orderservice.order.infrastructure.rest.dto.OrderResponse
+import org.hamcrest.Matchers.containsInAnyOrder
+import org.hamcrest.Matchers.hasSize
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito.given
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import org.mockito.kotlin.any
+import org.mockito.kotlin.then
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import java.math.BigDecimal
 import java.time.Instant
@@ -28,6 +37,12 @@ class OrderRestControllerTest(
 ) {
 	@MockitoBean
 	private lateinit var createOrderUseCase: CreateOrderUseCase
+
+	@MockitoBean
+	private lateinit var getCustomerOrdersUseCase: GetCustomerOrdersUseCase
+
+	@MockitoBean
+	private lateinit var getCustomersUseCase: GetCustomersUseCase
 
 	@Test
 	fun `should create order successfully`() {
@@ -103,6 +118,103 @@ class OrderRestControllerTest(
 					jsonPath("$.status") { value(400) }
 					jsonPath("$.detail") { value("Order amount must be positive, got -10.00") }
 				}
+			}
+	}
+
+	@Test
+	fun `successfully return all customer's orders`() {
+		// Given
+		val orders =
+			listOf(
+				Order.restore(
+					id = OrderId(UUID.randomUUID()),
+					customerId = CustomerId("customer_123"),
+					totalAmount = "100.00".toBigDecimal() of "PLN",
+					status = OrderStatus.CREATED,
+					createdAt = Instant.now(),
+					updatedAt = Instant.now(),
+				),
+				Order.restore(
+					id = OrderId(UUID.randomUUID()),
+					customerId = CustomerId("customer_123"),
+					totalAmount = "75.50".toBigDecimal() of "EUR",
+					status = OrderStatus.PAID,
+					createdAt = Instant.now(),
+					updatedAt = Instant.now(),
+				),
+			)
+		val expectedQuery = GetCustomerOrdersQuery(CustomerId("customer_123"))
+		given(getCustomerOrdersUseCase.invoke(expectedQuery)).willReturn(orders)
+
+		// When & then
+		mockMvc
+			.get("/orders?customerId=customer_123")
+			.andExpect {
+				status { isOk() }
+				content {
+					jsonPath("$.orders") { value(hasSize<OrderResponse>(2)) }
+					jsonPath("$.orders[0].customerId") { value("customer_123") }
+					jsonPath("$.orders[0].status") { value("created") }
+				}
+			}
+	}
+
+	@Test
+	fun `successfully return empty orders`() {
+		// Given
+		given(getCustomerOrdersUseCase.invoke(any())).willReturn(emptyList())
+
+		// When & then
+		mockMvc
+			.get("/orders?customerId=customer_123")
+			.andExpect {
+				status { isOk() }
+				content {
+					jsonPath("$.orders") { isEmpty() }
+				}
+			}
+	}
+
+	@Test
+	fun `when get orders query is incorrect, then response should be 400`() {
+		// When & then
+		mockMvc
+			.get("/orders")
+			.andExpect { status { isBadRequest() } }
+		then(getCustomerOrdersUseCase).shouldHaveNoInteractions()
+	}
+
+	@Test
+	fun `when get customers is called, then response should be 200`() {
+		// Given
+		given(getCustomersUseCase.invoke())
+			.willReturn(listOf(CustomerId("customer_123"), CustomerId("customer_456")))
+
+		// When & then
+		mockMvc
+			.get("/orders/customers")
+			.andExpect {
+				status { isOk() }
+				content {
+					jsonPath("$.customers") {
+						value(hasSize<String>(2))
+						value(containsInAnyOrder("customer_123", "customer_456"))
+					}
+				}
+			}
+	}
+
+	@Test
+	fun `when there is no customers, then empty list is returned`() {
+		// Given
+		given(getCustomersUseCase.invoke()).willReturn(emptyList())
+
+		// When & then
+		mockMvc
+			.get("/orders/customers")
+			.andExpect {
+				status { isOk() }
+				content { jsonPath("$.customers") { isEmpty() } }
 			}
 	}
 }

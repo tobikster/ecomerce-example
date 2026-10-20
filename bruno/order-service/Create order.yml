@@ -19,9 +19,9 @@ http:
 runtime:
   variables:
     - name: customer_id
-      value: ""
+      value: customer_456
     - name: amount
-      value: "-10.00"
+      value: "100.00"
     - name: currency_code
       value: PLN
 

@@ -22,14 +22,14 @@ class OrderExceptionHandler {
 
 	@ExceptionHandler(MethodArgumentNotValidException::class)
 	fun handleValidationException(exception: MethodArgumentNotValidException): ProblemDetail {
-		val errors = exception.bindingResult.fieldErrors.associate { it.field to (it.defaultMessage ?: "invalid") }
+		val fieldErrors = exception.bindingResult.fieldErrors.associate { it.field to (it.defaultMessage ?: "invalid") }
 
 		return ProblemDetail
 			.forStatusAndDetail(
 				HttpStatus.BAD_REQUEST,
 				"Validation failed for one or more fields",
 			).apply {
-				setProperty("errors", errors)
+				setProperty("errors", fieldErrors)
 			}
 	}
 }
