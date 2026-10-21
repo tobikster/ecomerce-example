@@ -1,0 +1,5 @@
+name: Default
+variables:
+  - name: SERVER_HOST
+    value: http://localhost:8080
+    description: ""
