@@ -7,6 +7,7 @@ mockito-kotlin = '6.4.0'
 spring-boot = '4.1.1'
 spring-dependencyManagement = '1.1.7'
 testcontainers = '2.0.5'
+springdoc = '3.1.1'
 
 [libraries]
 # Spring Boot Starters
@@ -36,6 +37,9 @@ testcontainers-bom = { module = 'org.testcontainers:testcontainers-bom', version
 testcontainers-postgresql = { module = 'org.testcontainers:testcontainers-postgresql' }
 testcontainers-junit = { module = 'org.testcontainers:testcontainers-junit-jupiter' }
 mockito-kotlin = { module = 'org.mockito.kotlin:mockito-kotlin', version.ref = 'mockito-kotlin' }
+
+# Documentation
+springdoc-openapi-webmvc-ui = { module = 'org.springdoc:springdoc-openapi-starter-webmvc-ui', version.ref = 'springdoc' }
 
 [plugins]
 detekt = { id = 'dev.detekt', version.ref = 'detekt' }

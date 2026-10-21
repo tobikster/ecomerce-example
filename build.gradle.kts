@@ -35,6 +35,8 @@ dependencies {
 	implementation(libs.flyway.postgresql)
 	runtimeOnly(libs.postgresql)
 
+	implementation(libs.springdoc.openapi.webmvc.ui)
+
 	testImplementation(platform(libs.testcontainers.bom))
 	testImplementation(libs.kotest.assertions)
 	testImplementation(libs.kotlin.junit5)

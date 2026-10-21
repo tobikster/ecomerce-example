@@ -41,3 +41,7 @@ management:
     endpoint:
         health:
             show-details: always
+
+springdoc:
+    default-produces-media-type: application/json
+    default-consumes-media-type: application/json
