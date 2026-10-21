@@ -10,6 +10,8 @@ import com.example.orderservice.order.domain.port.incoming.CreateOrderUseCase
 import com.example.orderservice.order.domain.port.incoming.GetCustomerOrdersQuery
 import com.example.orderservice.order.domain.port.incoming.GetCustomerOrdersUseCase
 import com.example.orderservice.order.domain.port.incoming.GetCustomersUseCase
+import com.example.orderservice.order.domain.port.incoming.GetOrderQuery
+import com.example.orderservice.order.domain.port.incoming.GetOrderUseCase
 import com.example.orderservice.order.infrastructure.rest.dto.OrderResponse
 import org.hamcrest.Matchers.containsInAnyOrder
 import org.hamcrest.Matchers.hasSize
@@ -37,6 +39,9 @@ class OrderRestControllerTest(
 ) {
 	@MockitoBean
 	private lateinit var createOrderUseCase: CreateOrderUseCase
+
+	@MockitoBean
+	private lateinit var getOrderUseCase: GetOrderUseCase
 
 	@MockitoBean
 	private lateinit var getCustomerOrdersUseCase: GetCustomerOrdersUseCase
@@ -119,6 +124,61 @@ class OrderRestControllerTest(
 					jsonPath("$.detail") { value("Order amount must be positive, got -10.00") }
 				}
 			}
+	}
+
+	@Test
+	fun `should return order by id when order exists`() {
+		// Given
+		val orderId = OrderId(UUID.randomUUID())
+		val order =
+			Order.restore(
+				id = orderId,
+				customerId = CustomerId("customer_123"),
+				totalAmount = "150.99".toBigDecimal() of "PLN",
+				status = OrderStatus.CREATED,
+				createdAt = Instant.now(),
+				updatedAt = Instant.now(),
+			)
+		given(getOrderUseCase.invoke(GetOrderQuery(orderId))).willReturn(order)
+
+		// When & then
+		mockMvc
+			.get("/orders/${orderId.value}")
+			.andExpect {
+				status { isOk() }
+				content {
+					jsonPath("$.id") { value(orderId.value.toString()) }
+					jsonPath("$.customerId") { value("customer_123") }
+					jsonPath("$.amount") { value(150.99) }
+					jsonPath("$.currencyCode") { value("PLN") }
+					jsonPath("$.status") { value("created") }
+				}
+			}
+	}
+
+	@Test
+	fun `should return 404 when order by id does not exist`() {
+		// Given
+		val nonExistentId = UUID.randomUUID()
+		given(getOrderUseCase.invoke(GetOrderQuery(OrderId(nonExistentId)))).willReturn(null)
+
+		// When & then
+		mockMvc
+			.get("/orders/$nonExistentId")
+			.andExpect {
+				status { isNotFound() }
+			}
+	}
+
+	@Test
+	fun `should return 400 when order id is not a valid uuid`() {
+		// When & then
+		mockMvc
+			.get("/orders/invalid-uuid")
+			.andExpect {
+				status { isBadRequest() }
+			}
+		then(getOrderUseCase).shouldHaveNoInteractions()
 	}
 
 	@Test
