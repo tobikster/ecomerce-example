@@ -16,6 +16,7 @@ spring-boot-starter-flyway = { module = 'org.springframework.boot:spring-boot-st
 spring-boot-starter-jpa = { module = 'org.springframework.boot:spring-boot-starter-data-jpa' }
 spring-boot-starter-web = { module = 'org.springframework.boot:spring-boot-starter-webmvc' }
 spring-boot-starter-validation = { module = 'org.springframework.boot:spring-boot-starter-validation' }
+spring-boot-starter-kafka = { module = 'org.springframework.boot:spring-boot-starter-kafka' }
 
 # Database
 flyway-postgresql = { module = 'org.flywaydb:flyway-database-postgresql' }

@@ -32,6 +32,7 @@ dependencies {
 	implementation(libs.spring.boot.starter.jpa)
 	implementation(libs.spring.boot.starter.flyway)
 	implementation(libs.spring.boot.starter.validation)
+	implementation(libs.spring.boot.starter.kafka)
 	implementation(libs.flyway.postgresql)
 	runtimeOnly(libs.postgresql)
 
