@@ -46,8 +46,10 @@ dependencies {
 	testImplementation(libs.spring.boot.starter.test)
 	testImplementation(libs.spring.boot.starter.webmvc.test)
 	testImplementation(libs.spring.boot.testcontainers)
+	testImplementation(libs.spring.kafka.test)
 	testImplementation(libs.testcontainers.junit)
 	testImplementation(libs.testcontainers.postgresql)
+	testImplementation(libs.testcontainers.kafka)
 	testRuntimeOnly(libs.junit.platform.launcher)
 }
 
