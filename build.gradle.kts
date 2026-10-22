@@ -32,6 +32,7 @@ dependencies {
 	implementation(libs.spring.boot.starter.jpa)
 	implementation(libs.spring.boot.starter.flyway)
 	implementation(libs.spring.boot.starter.validation)
+	implementation(libs.spring.boot.starter.kafka)
 	implementation(libs.flyway.postgresql)
 	runtimeOnly(libs.postgresql)
 
@@ -45,8 +46,10 @@ dependencies {
 	testImplementation(libs.spring.boot.starter.test)
 	testImplementation(libs.spring.boot.starter.webmvc.test)
 	testImplementation(libs.spring.boot.testcontainers)
+	testImplementation(libs.spring.kafka.test)
 	testImplementation(libs.testcontainers.junit)
 	testImplementation(libs.testcontainers.postgresql)
+	testImplementation(libs.testcontainers.kafka)
 	testRuntimeOnly(libs.junit.platform.launcher)
 }
 

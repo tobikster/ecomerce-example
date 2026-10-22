@@ -16,6 +16,7 @@ spring-boot-starter-flyway = { module = 'org.springframework.boot:spring-boot-st
 spring-boot-starter-jpa = { module = 'org.springframework.boot:spring-boot-starter-data-jpa' }
 spring-boot-starter-web = { module = 'org.springframework.boot:spring-boot-starter-webmvc' }
 spring-boot-starter-validation = { module = 'org.springframework.boot:spring-boot-starter-validation' }
+spring-boot-starter-kafka = { module = 'org.springframework.boot:spring-boot-starter-kafka' }
 
 # Database
 flyway-postgresql = { module = 'org.flywaydb:flyway-database-postgresql' }
@@ -33,8 +34,10 @@ spring-boot-starter-test = { module = 'org.springframework.boot:spring-boot-star
 spring-boot-starter-data-jpa-test = { module = 'org.springframework.boot:spring-boot-starter-data-jpa-test' }
 spring-boot-starter-webmvc-test = { module = 'org.springframework.boot:spring-boot-starter-webmvc-test' }
 spring-boot-testcontainers = { module = 'org.springframework.boot:spring-boot-testcontainers' }
+spring-kafka-test = { module = 'org.springframework.kafka:spring-kafka-test' }
 testcontainers-bom = { module = 'org.testcontainers:testcontainers-bom', version.ref = 'testcontainers' }
 testcontainers-postgresql = { module = 'org.testcontainers:testcontainers-postgresql' }
+testcontainers-kafka = { module = 'org.testcontainers:testcontainers-kafka' }
 testcontainers-junit = { module = 'org.testcontainers:testcontainers-junit-jupiter' }
 mockito-kotlin = { module = 'org.mockito.kotlin:mockito-kotlin', version.ref = 'mockito-kotlin' }
 
