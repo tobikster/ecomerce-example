@@ -16,6 +16,30 @@ services:
             timeout: 5s
             retries: 5
 
+    kafka:
+        image: apache/kafka:4.3.2
+        container_name: orders-kafka
+        ports:
+            - "9094:9094"
+        environment:
+            KAFKA_NODE_ID: 1
+            KAFKA_PROCESS_ROLES: broker,controller
+            KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+            KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,PLAINTEXT_HOST://0.0.0.0:9094
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9094
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT
+            KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+            KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+            KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+            KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+            KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+        healthcheck:
+            test: [ "CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 || exit 1" ]
+            interval: 5s
+            timeout: 5s
+            retries: 5
+
     order-service:
         build:
             context: .
@@ -29,10 +53,27 @@ services:
             POSTGRES_DB: ${POSTGRES_DB:-orders_db}
             POSTGRES_USER: ${POSTGRES_USER:-postgres}
             POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+            KAFKA_BOOTSTRAP_SERVERS: kafka:9092
         ports:
             - "8080:8080"
         depends_on:
             database:
+                condition: service_healthy
+            kafka:
+                condition: service_healthy
+
+    kafka-ui:
+        image: provectuslabs/kafka-ui:v0.7.2
+        container_name: orders-kafka-ui
+        profiles:
+            - tools
+        ports:
+            - "8085:8080"
+        environment:
+            KAFKA_CLUSTERS_0_NAME: local-cluster
+            KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+        depends_on:
+            kafka:
                 condition: service_healthy
 
     adminer:
