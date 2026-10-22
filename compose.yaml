@@ -16,15 +16,34 @@ services:
             timeout: 5s
             retries: 5
 
+    order-service:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: order-service-app
+        profiles:
+            - app
+        environment:
+            DB_HOST: database
+            POSTGRES_PORT: 5432
+            POSTGRES_DB: ${POSTGRES_DB:-orders_db}
+            POSTGRES_USER: ${POSTGRES_USER:-postgres}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+        ports:
+            - "8080:8080"
+        depends_on:
+            database:
+                condition: service_healthy
+
     adminer:
         image: adminer:latest
         container_name: orders-adminer
         profiles:
-            -   tools
+            - tools
         ports:
-            -   "8081:8080"
+            - "8081:8080"
         depends_on:
-            -   database
+            - database
 
 volumes:
     postgres-data:
