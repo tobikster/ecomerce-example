@@ -1,82 +1,39 @@
+import dev.detekt.gradle.extensions.DetektExtension
+import org.jlleitschuh.gradle.ktlint.KtlintExtension
+
 plugins {
-	alias(libs.plugins.kotlin.jvm)
-	alias(libs.plugins.kotlin.spring)
-	alias(libs.plugins.spring.boot)
-	alias(libs.plugins.spring.dependencyManagement)
-	alias(libs.plugins.kotlin.jpa)
+	alias(libs.plugins.kotlin.jvm) apply false
+	alias(libs.plugins.kotlin.spring) apply false
+	alias(libs.plugins.spring.boot) apply false
+	alias(libs.plugins.spring.dependencyManagement) apply false
+	alias(libs.plugins.kotlin.jpa) apply false
 
-	alias(libs.plugins.detekt)
-	alias(libs.plugins.ktlint)
+	alias(libs.plugins.detekt) apply false
+	alias(libs.plugins.ktlint) apply false
 }
 
-group = "com.example"
-version = "0.0.1-SNAPSHOT"
-description = "order-service"
-
-java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
+subprojects {
+	pluginManager.withPlugin(
+		rootProject.libs.plugins.ktlint
+			.get()
+			.pluginId,
+	) {
+		configure<KtlintExtension> {
+			android = false
+		}
 	}
-}
 
-repositories {
-	mavenCentral()
-}
-
-dependencies {
-	implementation(libs.spring.boot.starter.actuator)
-	implementation(libs.spring.boot.starter.web)
-	implementation(libs.kotlin.reflect)
-	implementation(libs.jackson.kotlin)
-
-	implementation(libs.spring.boot.starter.jpa)
-	implementation(libs.spring.boot.starter.flyway)
-	implementation(libs.spring.boot.starter.validation)
-	implementation(libs.spring.boot.starter.kafka)
-	implementation(libs.flyway.postgresql)
-	runtimeOnly(libs.postgresql)
-
-	implementation(libs.springdoc.openapi.webmvc.ui)
-
-	testImplementation(platform(libs.testcontainers.bom))
-	testImplementation(libs.kotest.assertions)
-	testImplementation(libs.kotlin.junit5)
-	testImplementation(libs.mockito.kotlin)
-	testImplementation(libs.spring.boot.starter.data.jpa.test)
-	testImplementation(libs.spring.boot.starter.test)
-	testImplementation(libs.spring.boot.starter.webmvc.test)
-	testImplementation(libs.spring.boot.testcontainers)
-	testImplementation(libs.spring.kafka.test)
-	testImplementation(libs.testcontainers.junit)
-	testImplementation(libs.testcontainers.postgresql)
-	testImplementation(libs.testcontainers.kafka)
-	testRuntimeOnly(libs.junit.platform.launcher)
-}
-
-kotlin {
-	compilerOptions {
-		freeCompilerArgs.addAll(
-			"-Xjsr305=strict",
-			"-Xannotation-default-target=param-property",
-			"-Xconsistent-data-class-copy-visibility",
-		)
+	pluginManager.withPlugin(
+		rootProject.libs.plugins.detekt
+			.get()
+			.pluginId,
+	) {
+		configure<DetektExtension> {
+			buildUponDefaultConfig = true
+		}
 	}
-}
 
-allOpen {
-	annotation("jakarta.persistence.Entity")
-	annotation("jakarta.persistence.MappedSuperclass")
-	annotation("jakarta.persistence.Embeddable")
-}
-
-ktlint {
-	android = false
-}
-
-detekt {
-	buildUponDefaultConfig = true
-}
-
-tasks.withType<Test> {
-	useJUnitPlatform()
+	tasks.withType<Test>().configureEach {
+		useJUnitPlatform()
+	}
 }

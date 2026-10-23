@@ -4,7 +4,7 @@
       <option value="$PROJECT_DIR$/.env" />
     </option>
     <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UnknownPolicyInFreeMode" />
-    <module name="order-service.main" />
+    <module name="ecommerce-system.order-service.main" />
     <selectedOptions>
       <option name="environmentVariables" />
     </selectedOptions>

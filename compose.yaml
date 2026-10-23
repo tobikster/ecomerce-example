@@ -43,7 +43,7 @@ services:
     order-service:
         build:
             context: .
-            dockerfile: Dockerfile
+            dockerfile: order-service/Dockerfile
         container_name: order-service-app
         profiles:
             - app
