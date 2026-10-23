@@ -3,12 +3,12 @@ package com.example.paymentservice.account.infrastructure.rest
 import com.example.paymentservice.account.domain.model.Account
 import com.example.paymentservice.account.domain.model.AccountException
 import com.example.paymentservice.account.domain.model.AccountId
-import com.example.paymentservice.account.domain.model.CustomerId
-import com.example.paymentservice.account.domain.model.of
 import com.example.paymentservice.account.domain.port.incoming.DepositUseCase
 import com.example.paymentservice.account.domain.port.incoming.GetAccountsQuery
 import com.example.paymentservice.account.domain.port.incoming.GetAccountsUseCase
 import com.example.paymentservice.account.domain.port.incoming.WithdrawUseCase
+import com.example.paymentservice.common.domain.model.CustomerId
+import com.example.paymentservice.common.domain.model.of
 import com.example.paymentservice.infrastructure.rest.GlobalRestExceptionHandler
 import org.hamcrest.Matchers.containsString
 import org.hamcrest.Matchers.hasSize

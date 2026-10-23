@@ -1,8 +1,8 @@
 package com.example.paymentservice.account.infrastructure.rest.dto
 
-import com.example.paymentservice.account.domain.model.CustomerId
-import com.example.paymentservice.account.domain.model.of
 import com.example.paymentservice.account.domain.port.incoming.DepositCommand
+import com.example.paymentservice.common.domain.model.CustomerId
+import com.example.paymentservice.common.domain.model.of
 import com.example.paymentservice.infrastructure.rest.validation.ValidCurrencyCode
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Positive

@@ -83,6 +83,7 @@ services:
             POSTGRES_DB_ORDERS: ${POSTGRES_DB_PAYMENTS:-payments_db}
             POSTGRES_USER: ${POSTGRES_USER:-postgres}
             POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+            KAFKA_BOOTSTRAP_SERVERS: kafka:9092
         ports:
             - "8081:8081"
         healthcheck:

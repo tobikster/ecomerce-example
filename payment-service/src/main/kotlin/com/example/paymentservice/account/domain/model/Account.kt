@@ -1,5 +1,7 @@
 package com.example.paymentservice.account.domain.model
 
+import com.example.paymentservice.common.domain.model.CustomerId
+import com.example.paymentservice.common.domain.model.Money
 import java.time.Instant
 import java.util.Currency
 import java.util.UUID
@@ -67,12 +69,3 @@ data class Account private constructor(
 value class AccountId(
 	val value: UUID = UUID.randomUUID(),
 )
-
-@JvmInline
-value class CustomerId(
-	val value: String,
-) {
-	init {
-		require(value.isNotBlank()) { "Customer ID cannot be blank" }
-	}
-}

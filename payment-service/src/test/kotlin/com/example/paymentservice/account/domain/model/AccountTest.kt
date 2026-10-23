@@ -1,5 +1,7 @@
 package com.example.paymentservice.account.domain.model
 
+import com.example.paymentservice.common.domain.model.CustomerId
+import com.example.paymentservice.common.domain.model.of
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.comparables.shouldBeGreaterThanOrEqualTo
 import io.kotest.matchers.nulls.shouldNotBeNull

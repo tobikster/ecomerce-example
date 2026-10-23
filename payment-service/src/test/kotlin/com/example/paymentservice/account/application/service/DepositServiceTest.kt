@@ -1,10 +1,10 @@
 package com.example.paymentservice.account.application.service
 
 import com.example.paymentservice.account.domain.model.Account
-import com.example.paymentservice.account.domain.model.CustomerId
-import com.example.paymentservice.account.domain.model.of
 import com.example.paymentservice.account.domain.port.incoming.DepositCommand
 import com.example.paymentservice.account.domain.port.outgoing.AccountRepositoryPort
+import com.example.paymentservice.common.domain.model.CustomerId
+import com.example.paymentservice.common.domain.model.of
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any

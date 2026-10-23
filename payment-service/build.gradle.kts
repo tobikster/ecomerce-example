@@ -31,11 +31,15 @@ dependencies {
 	implementation(libs.flyway.postgresql)
 	runtimeOnly(libs.postgresql)
 
+	implementation(libs.spring.boot.starter.kafka)
+
 	implementation(libs.springdoc.openapi.webmvc.ui)
 
 	testImplementation(platform(libs.testcontainers.bom))
 	testImplementation(libs.testcontainers.junit)
 	testImplementation(libs.testcontainers.postgresql)
+	testImplementation(libs.testcontainers.kafka)
+	testImplementation(libs.spring.kafka.test)
 	testImplementation(libs.spring.boot.testcontainers)
 	testImplementation(libs.spring.boot.starter.data.jpa.test)
 	testImplementation(libs.spring.boot.starter.webmvc.test)

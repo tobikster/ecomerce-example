@@ -1,4 +1,4 @@
-package com.example.paymentservice.account.domain.model
+package com.example.paymentservice.common.domain.model
 
 import java.math.BigDecimal
 import java.util.Currency

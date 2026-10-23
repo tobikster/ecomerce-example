@@ -2,7 +2,6 @@ package com.example.paymentservice.account.infrastructure.rest
 
 import com.example.paymentservice.account.domain.model.Account
 import com.example.paymentservice.account.domain.model.AccountException
-import com.example.paymentservice.account.domain.model.CustomerId
 import com.example.paymentservice.account.domain.port.incoming.DepositUseCase
 import com.example.paymentservice.account.domain.port.incoming.GetAccountsQuery
 import com.example.paymentservice.account.domain.port.incoming.GetAccountsUseCase
@@ -12,6 +11,7 @@ import com.example.paymentservice.account.infrastructure.rest.dto.DepositRequest
 import com.example.paymentservice.account.infrastructure.rest.dto.WithdrawRequest
 import com.example.paymentservice.account.infrastructure.rest.dto.toCommand
 import com.example.paymentservice.account.infrastructure.rest.dto.toResponse
+import com.example.paymentservice.common.domain.model.CustomerId
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid

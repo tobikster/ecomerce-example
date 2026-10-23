@@ -1,5 +1,7 @@
 package com.example.paymentservice.account.domain.model
 
+import com.example.paymentservice.common.domain.model.Money
+import com.example.paymentservice.common.domain.model.of
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
