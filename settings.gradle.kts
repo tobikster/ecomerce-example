@@ -9,4 +9,14 @@ dependencyResolutionManagement {
 	}
 }
 
-include(":order-service")
+fun includeIfExists(vararg projectPaths: String) {
+	projectPaths.forEach { projectPath ->
+		val dirPath = projectPath.removePrefix(":").replace(":", File.separator)
+		if (file(dirPath).isDirectory) {
+			include(projectPath)
+		}
+	}
+}
+
+includeIfExists(":order-service")
+includeIfExists(":payment-service")

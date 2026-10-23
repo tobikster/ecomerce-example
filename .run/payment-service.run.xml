@@ -1,14 +1,14 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="App" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+  <configuration default="false" name="payment-service" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <option name="envFilePaths">
       <option value="$PROJECT_DIR$/.env" />
     </option>
     <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UnknownPolicyInFreeMode" />
-    <module name="ecommerce-system.order-service.main" />
+    <module name="ecommerce-system.payment-service.main" />
     <selectedOptions>
       <option name="environmentVariables" />
     </selectedOptions>
-    <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.orderservice.OrderServiceApplication" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.paymentservice.PaymentServiceApplication" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="com.example.orderservice.*" />
@@ -17,7 +17,7 @@
     </extension>
     <method v="2">
       <option name="Make" enabled="true" />
-      <option name="RunConfigurationTask" enabled="true" run_configuration_name="Infra" run_configuration_type="docker-deploy" />
+      <option name="RunConfigurationTask" enabled="false" run_configuration_name="Infra" run_configuration_type="docker-deploy" />
     </method>
   </configuration>
 </component>
