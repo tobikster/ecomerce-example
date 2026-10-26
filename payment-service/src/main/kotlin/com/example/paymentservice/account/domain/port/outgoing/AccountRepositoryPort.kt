@@ -5,6 +5,8 @@ import com.example.paymentservice.account.domain.model.CustomerId
 import java.util.Currency
 
 interface AccountRepositoryPort {
+	fun findByCustomerId(customerId: CustomerId): List<Account>
+
 	fun findByCustomerIdAndCurrency(
 		customerId: CustomerId,
 		currency: Currency,

@@ -6,6 +6,8 @@ import com.example.paymentservice.account.domain.model.AccountId
 import com.example.paymentservice.account.domain.model.CustomerId
 import com.example.paymentservice.account.domain.model.of
 import com.example.paymentservice.account.domain.port.incoming.DepositUseCase
+import com.example.paymentservice.account.domain.port.incoming.GetAccountsQuery
+import com.example.paymentservice.account.domain.port.incoming.GetAccountsUseCase
 import com.example.paymentservice.account.domain.port.incoming.WithdrawUseCase
 import com.example.paymentservice.infrastructure.rest.GlobalRestExceptionHandler
 import org.hamcrest.Matchers.containsString
@@ -22,6 +24,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import java.math.BigDecimal
 import java.util.Currency
@@ -38,7 +41,11 @@ class AccountRestControllerTest(
 	@MockitoBean
 	private lateinit var withdrawUseCase: WithdrawUseCase
 
+	@MockitoBean
+	private lateinit var getAccountsUseCase: GetAccountsUseCase
+
 	private val pln = Currency.getInstance("PLN")
+	private val eur = Currency.getInstance("EUR")
 	private val customerId = CustomerId("customer_123")
 
 	@Test
@@ -280,6 +287,78 @@ class AccountRestControllerTest(
 			}
 
 		then(withdrawUseCase).should().invoke(any())
+	}
+
+	@Test
+	fun `should return customer accounts and 200 OK when customer has accounts`() {
+		// Given
+		val accountPln =
+			Account.restore(
+				id = AccountId(UUID.randomUUID()),
+				customerId = customerId,
+				balance = BigDecimal("100.00") of pln,
+			)
+		val accountEur =
+			Account.restore(
+				id = AccountId(UUID.randomUUID()),
+				customerId = customerId,
+				balance = BigDecimal("50.00") of eur,
+			)
+		given { getAccountsUseCase.invoke(GetAccountsQuery(customerId)) } willReturn { listOf(accountPln, accountEur) }
+
+		// When & Then
+		mockMvc
+			.get("/accounts/${customerId.value}")
+			.andExpect {
+				status { isOk() }
+				content {
+					jsonPath("$", hasSize<Any>(2))
+					jsonPath("$[0].id") { value(accountPln.id.value.toString()) }
+					jsonPath("$[0].customerId") { value(customerId.value) }
+					jsonPath("$[0].balance") { value(100.00) }
+					jsonPath("$[0].currencyCode") { value("PLN") }
+					jsonPath("$[1].id") { value(accountEur.id.value.toString()) }
+					jsonPath("$[1].customerId") { value(customerId.value) }
+					jsonPath("$[1].balance") { value(50.00) }
+					jsonPath("$[1].currencyCode") { value("EUR") }
+				}
+			}
+
+		then(getAccountsUseCase).should().invoke(GetAccountsQuery(customerId))
+	}
+
+	@Test
+	fun `should return empty list and 200 OK when customer has no accounts`() {
+		// Given
+		given { getAccountsUseCase.invoke(GetAccountsQuery(customerId)) } willReturn { emptyList() }
+
+		// When & Then
+		mockMvc
+			.get("/accounts/${customerId.value}")
+			.andExpect {
+				status { isOk() }
+				content {
+					jsonPath("$", hasSize<Any>(0))
+				}
+			}
+
+		then(getAccountsUseCase).should().invoke(GetAccountsQuery(customerId))
+	}
+
+	@Test
+	fun `should return 400 Bad Request when customer id is blank during get accounts`() {
+		// When & Then
+		mockMvc
+			.get("/accounts/   ")
+			.andExpect {
+				status { isBadRequest() }
+				content {
+					jsonPath("$.status") { value(400) }
+					jsonPath("$.errors[0].field") { value("customerId") }
+				}
+			}
+
+		then(getAccountsUseCase).shouldHaveNoInteractions()
 	}
 
 	private fun createDepositRequest(

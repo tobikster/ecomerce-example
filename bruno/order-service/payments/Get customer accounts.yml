@@ -1,0 +1,20 @@
+info:
+  name: Get customer accounts
+  type: http
+  seq: 3
+
+http:
+  method: GET
+  url: "{{BASE_URL_PAYMENTS}}/accounts/:customer_id"
+  params:
+    - name: customer_id
+      value: customer_123
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

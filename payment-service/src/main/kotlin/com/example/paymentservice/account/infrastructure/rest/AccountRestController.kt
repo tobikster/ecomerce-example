@@ -1,7 +1,11 @@
 package com.example.paymentservice.account.infrastructure.rest
 
+import com.example.paymentservice.account.domain.model.Account
 import com.example.paymentservice.account.domain.model.AccountException
+import com.example.paymentservice.account.domain.model.CustomerId
 import com.example.paymentservice.account.domain.port.incoming.DepositUseCase
+import com.example.paymentservice.account.domain.port.incoming.GetAccountsQuery
+import com.example.paymentservice.account.domain.port.incoming.GetAccountsUseCase
 import com.example.paymentservice.account.domain.port.incoming.WithdrawUseCase
 import com.example.paymentservice.account.infrastructure.rest.dto.AccountResponse
 import com.example.paymentservice.account.infrastructure.rest.dto.DepositRequest
@@ -17,6 +21,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -29,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController
 class AccountRestController(
 	private val deposit: DepositUseCase,
 	private val withdraw: WithdrawUseCase,
+	private val getAccounts: GetAccountsUseCase,
 ) {
 	@Operation(
 		summary = "Deposit funds on account",
@@ -60,6 +66,16 @@ class AccountRestController(
 	): ResponseEntity<AccountResponse> {
 		val command = request.toCommand(customerId)
 		val response = withdraw(command).toResponse()
+
+		return ResponseEntity.ok(response)
+	}
+
+	@GetMapping("/{customerId}")
+	fun getAccounts(
+		@PathVariable @NotBlank @Size(min = 1, max = 64) customerId: String,
+	): ResponseEntity<List<AccountResponse>> {
+		val accounts = getAccounts(GetAccountsQuery(CustomerId(customerId)))
+		val response = accounts.map(Account::toResponse)
 
 		return ResponseEntity.ok(response)
 	}

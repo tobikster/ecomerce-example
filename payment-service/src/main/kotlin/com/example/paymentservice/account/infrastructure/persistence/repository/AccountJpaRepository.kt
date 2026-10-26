@@ -6,6 +6,8 @@ import java.util.Currency
 import java.util.UUID
 
 interface AccountJpaRepository : JpaRepository<AccountEntity, UUID> {
+	fun findByCustomerId(customerId: String): List<AccountEntity>
+
 	fun findByCustomerIdAndCurrency(
 		customerId: String,
 		currency: Currency,

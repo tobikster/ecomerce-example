@@ -3,6 +3,7 @@ package com.example.paymentservice.account.infrastructure.persistence.adapter
 import com.example.paymentservice.account.domain.model.Account
 import com.example.paymentservice.account.domain.model.CustomerId
 import com.example.paymentservice.account.domain.port.outgoing.AccountRepositoryPort
+import com.example.paymentservice.account.infrastructure.persistence.entity.AccountEntity
 import com.example.paymentservice.account.infrastructure.persistence.mapper.toDomain
 import com.example.paymentservice.account.infrastructure.persistence.mapper.toEntity
 import com.example.paymentservice.account.infrastructure.persistence.repository.AccountJpaRepository
@@ -13,6 +14,11 @@ import java.util.Currency
 class AccountPersistenceAdapter(
 	private val repository: AccountJpaRepository,
 ) : AccountRepositoryPort {
+	override fun findByCustomerId(customerId: CustomerId) =
+		repository
+			.findByCustomerId(customerId.value)
+			.map(AccountEntity::toDomain)
+
 	override fun findByCustomerIdAndCurrency(
 		customerId: CustomerId,
 		currency: Currency,
