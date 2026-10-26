@@ -6,6 +6,7 @@ services:
             POSTGRES_USER: ${POSTGRES_USER:-postgres}
             POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
             POSTGRES_DB_ORDERS: ${POSTGRES_DB_ORDERS:-orders_db}
+            POSTGRES_DB_PAYMENTS: ${POSTGRES_DB_PAYMENTS:-payments_db}
         ports:
             - "${POSTGRES_PORT:-5432}:5432"
         volumes:
@@ -76,6 +77,12 @@ services:
         container_name: payment-service
         profiles:
             - app
+        environment:
+            DB_HOST: database
+            POSTGRES_PORT: 5432
+            POSTGRES_DB_ORDERS: ${POSTGRES_DB_PAYMENTS:-payments_db}
+            POSTGRES_USER: ${POSTGRES_USER:-postgres}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
         ports:
             - "8081:8081"
         healthcheck:

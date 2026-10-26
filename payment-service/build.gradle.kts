@@ -3,6 +3,7 @@ plugins {
 	alias(libs.plugins.kotlin.spring)
 	alias(libs.plugins.spring.boot)
 	alias(libs.plugins.spring.dependencyManagement)
+	alias(libs.plugins.kotlin.jpa)
 
 	alias(libs.plugins.detekt)
 	alias(libs.plugins.ktlint)
@@ -24,9 +25,25 @@ dependencies {
 	implementation(libs.kotlin.reflect)
 	implementation(libs.jackson.kotlin)
 
+	implementation(libs.spring.boot.starter.jpa)
+	implementation(libs.spring.boot.starter.flyway)
+	implementation(libs.spring.boot.starter.validation)
+	implementation(libs.flyway.postgresql)
+	runtimeOnly(libs.postgresql)
+
+	implementation(libs.springdoc.openapi.webmvc.ui)
+
+	testImplementation(platform(libs.testcontainers.bom))
+	testImplementation(libs.testcontainers.junit)
+	testImplementation(libs.testcontainers.postgresql)
+	testImplementation(libs.spring.boot.testcontainers)
+	testImplementation(libs.spring.boot.starter.data.jpa.test)
+	testImplementation(libs.spring.boot.starter.webmvc.test)
 	testImplementation(libs.kotlin.junit5)
 	testImplementation(libs.spring.boot.starter.test)
+	testImplementation(libs.mockito.kotlin)
 	testRuntimeOnly(libs.junit.platform.launcher)
+	testImplementation(libs.kotest.assertions)
 }
 
 kotlin {

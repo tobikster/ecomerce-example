@@ -13,3 +13,4 @@ create_database() {
 }
 
 create_database "${POSTGRES_DB_ORDERS}"
+create_database "${POSTGRES_DB_PAYMENTS}"
