@@ -1,5 +1,8 @@
 name: Default
 variables:
-  - name: SERVER_HOST
+  - name: BASE_URL_ORDERS
     value: http://localhost:8080
+    description: ""
+  - name: BASE_URL_PAYMENTS
+    value: http://localhost:8081
     description: ""

@@ -5,7 +5,7 @@ info:
 
 http:
   method: POST
-  url: "{{SERVER_HOST}}/orders"
+  url: "{{BASE_URL_ORDERS}}/orders"
   body:
     type: json
     data: |-
@@ -35,7 +35,7 @@ settings:
 examples:
   - name: Successful create order
     request:
-      url: "{{SERVER_HOST}}/orders"
+      url: "{{BASE_URL_ORDERS}}/orders"
       method: POST
       body:
         type: json
@@ -75,7 +75,7 @@ examples:
           }
   - name: Invalid amount
     request:
-      url: "{{SERVER_HOST}}/orders"
+      url: "{{BASE_URL_ORDERS}}/orders"
       method: POST
       body:
         type: json
@@ -102,7 +102,7 @@ examples:
         data: '{"detail":"Order amount must be positive, got -10.00","instance":"/orders","status":400,"title":"Bad Request"}'
   - name: Empty customer id
     request:
-      url: "{{SERVER_HOST}}/orders"
+      url: "{{BASE_URL_ORDERS}}/orders"
       method: POST
       body:
         type: json
