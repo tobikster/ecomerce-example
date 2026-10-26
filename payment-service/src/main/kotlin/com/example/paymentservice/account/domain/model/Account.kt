@@ -27,6 +27,10 @@ data class Account private constructor(
 			"Currency mismatch: cannot withdraw ${funds.currency} from account with ${balance.currency}!"
 		}
 
+		if (balance.amount < funds.amount) {
+			throw AccountException.InsufficientFunds(requested = funds, available = balance)
+		}
+
 		return copy(
 			balance = balance - funds,
 			updatedAt = Instant.now(),

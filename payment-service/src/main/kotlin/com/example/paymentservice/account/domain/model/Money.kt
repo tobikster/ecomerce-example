@@ -27,6 +27,8 @@ data class Money(
 		return (amount - other.amount) of currency
 	}
 
+	override fun toString() = "$amount $currency"
+
 	companion object {
 		fun zero(currency: Currency) = BigDecimal.ZERO of currency
 	}

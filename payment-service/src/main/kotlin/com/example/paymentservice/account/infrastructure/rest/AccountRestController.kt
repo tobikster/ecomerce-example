@@ -1,8 +1,11 @@
 package com.example.paymentservice.account.infrastructure.rest
 
+import com.example.paymentservice.account.domain.model.AccountException
 import com.example.paymentservice.account.domain.port.incoming.DepositUseCase
+import com.example.paymentservice.account.domain.port.incoming.WithdrawUseCase
 import com.example.paymentservice.account.infrastructure.rest.dto.AccountResponse
 import com.example.paymentservice.account.infrastructure.rest.dto.DepositRequest
+import com.example.paymentservice.account.infrastructure.rest.dto.WithdrawRequest
 import com.example.paymentservice.account.infrastructure.rest.dto.toCommand
 import com.example.paymentservice.account.infrastructure.rest.dto.toResponse
 import io.swagger.v3.oas.annotations.Operation
@@ -10,7 +13,10 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
+import org.springframework.http.HttpStatus
+import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -22,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/accounts")
 class AccountRestController(
 	private val deposit: DepositUseCase,
+	private val withdraw: WithdrawUseCase,
 ) {
 	@Operation(
 		summary = "Deposit funds on account",
@@ -39,4 +46,32 @@ class AccountRestController(
 
 		return ResponseEntity.ok(response)
 	}
+
+	@Operation(
+		summary = "Withdraw funds from account",
+		description =
+			"Withdraw funds from an account under the given currency. " +
+				"Cannot withdraw, if the account doesn't have enough funds.",
+	)
+	@PostMapping("/{customerId}/withdraws")
+	fun withdraw(
+		@PathVariable @NotBlank @Size(min = 1, max = 64) customerId: String,
+		@RequestBody @Valid request: WithdrawRequest,
+	): ResponseEntity<AccountResponse> {
+		val command = request.toCommand(customerId)
+		val response = withdraw(command).toResponse()
+
+		return ResponseEntity.ok(response)
+	}
+
+	@ExceptionHandler(AccountException::class)
+	fun handleAccountException(e: AccountException): ProblemDetail =
+		when (e) {
+			is AccountException.InsufficientFunds -> {
+				ProblemDetail.forStatusAndDetail(
+					HttpStatus.UNPROCESSABLE_CONTENT,
+					e.message,
+				)
+			}
+		}
 }

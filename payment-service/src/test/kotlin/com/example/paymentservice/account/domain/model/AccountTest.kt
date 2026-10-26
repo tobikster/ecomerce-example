@@ -116,12 +116,9 @@ class AccountTest {
 				.deposit(BigDecimal("50.00") of pln)
 
 		// When & Then
-		val exception =
-			shouldThrow<IllegalArgumentException> {
-				account.withdraw(BigDecimal("50.01") of pln)
-			}
-
-		exception.message shouldContain "Amount cannot be negative"
+		shouldThrow<AccountException.InsufficientFunds> {
+			account.withdraw(BigDecimal("50.01") of pln)
+		}
 	}
 
 	@Test
