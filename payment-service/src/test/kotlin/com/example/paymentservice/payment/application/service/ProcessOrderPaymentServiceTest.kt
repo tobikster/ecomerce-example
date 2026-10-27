@@ -1,7 +1,7 @@
 package com.example.paymentservice.payment.application.service
 
 import com.example.paymentservice.account.domain.model.Account
-import com.example.paymentservice.account.domain.model.AccountException
+import com.example.paymentservice.account.domain.model.WithdrawResult
 import com.example.paymentservice.account.domain.port.incoming.WithdrawCommand
 import com.example.paymentservice.account.domain.port.incoming.WithdrawUseCase
 import com.example.paymentservice.common.domain.model.CustomerId
@@ -23,7 +23,6 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.then
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.willReturn
-import org.mockito.kotlin.willThrow
 import java.math.BigDecimal
 import java.util.Currency
 import java.util.UUID
@@ -45,7 +44,7 @@ class ProcessOrderPaymentServiceTest {
 		val account = Account.create(customerId, pln).deposit(BigDecimal("200.00") of pln)
 
 		given { paymentRepository.findByOrderId(orderId) } willReturn { null }
-		given { withdraw(WithdrawCommand(customerId, amount)) } willReturn { account }
+		given { withdraw(WithdrawCommand(customerId, amount)) } willReturn { WithdrawResult.Success(account) }
 
 		// When
 		service(command)
@@ -66,14 +65,14 @@ class ProcessOrderPaymentServiceTest {
 	fun `should record failed payment when account has insufficient funds`() {
 		// Given
 		val command = ProcessOrderPaymentCommand(orderId, customerId, amount)
-		val insufficientFundsException =
-			AccountException.InsufficientFunds(
+
+		given { paymentRepository.findByOrderId(orderId) } willReturn { null }
+		given { withdraw(WithdrawCommand(customerId, amount)) } willReturn {
+			WithdrawResult.Failure.InsufficientFunds(
 				requested = amount,
 				available = BigDecimal("50.00") of pln,
 			)
-
-		given { paymentRepository.findByOrderId(orderId) } willReturn { null }
-		given { withdraw(WithdrawCommand(customerId, amount)) } willThrow { insufficientFundsException }
+		}
 
 		// When
 		service(command)

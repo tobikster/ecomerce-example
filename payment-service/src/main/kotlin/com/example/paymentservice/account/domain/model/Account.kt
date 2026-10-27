@@ -24,19 +24,20 @@ data class Account private constructor(
 		)
 	}
 
-	fun withdraw(funds: Money): Account {
-		require(balance.currency == funds.currency) {
-			"Currency mismatch: cannot withdraw ${funds.currency} from account with ${balance.currency}!"
+	@Suppress("ReturnCount") // additional returns are only guard conditions
+	fun withdraw(funds: Money): WithdrawResult {
+		if (balance.currency != funds.currency) {
+			return WithdrawResult.Failure.CurrencyMismatch(balance.currency, funds.currency)
 		}
 
 		if (balance.amount < funds.amount) {
-			throw AccountException.InsufficientFunds(requested = funds, available = balance)
+			return WithdrawResult.Failure.InsufficientFunds(requested = funds, available = balance)
 		}
 
 		return copy(
 			balance = balance - funds,
 			updatedAt = Instant.now(),
-		)
+		).let(WithdrawResult::Success)
 	}
 
 	companion object {

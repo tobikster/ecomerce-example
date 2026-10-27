@@ -1,7 +1,7 @@
 package com.example.paymentservice.account.infrastructure.rest
 
 import com.example.paymentservice.account.domain.model.Account
-import com.example.paymentservice.account.domain.model.AccountException
+import com.example.paymentservice.account.domain.model.WithdrawResult
 import com.example.paymentservice.account.domain.port.incoming.DepositUseCase
 import com.example.paymentservice.account.domain.port.incoming.GetAccountsQuery
 import com.example.paymentservice.account.domain.port.incoming.GetAccountsUseCase
@@ -65,9 +65,14 @@ class AccountRestController(
 		@RequestBody @Valid request: WithdrawRequest,
 	): ResponseEntity<AccountResponse> {
 		val command = request.toCommand(customerId)
-		val response = withdraw(command).toResponse()
 
-		return ResponseEntity.ok(response)
+		val account =
+			when (val result = withdraw(command)) {
+				is WithdrawResult.Success -> result.account
+				is WithdrawResult.Failure -> throw WithdrawWebException(result)
+			}
+
+		return ResponseEntity.ok(account.toResponse())
 	}
 
 	@GetMapping("/{customerId}")
@@ -80,14 +85,27 @@ class AccountRestController(
 		return ResponseEntity.ok(response)
 	}
 
-	@ExceptionHandler(AccountException::class)
-	fun handleAccountException(e: AccountException): ProblemDetail =
-		when (e) {
-			is AccountException.InsufficientFunds -> {
+	@ExceptionHandler(WithdrawWebException::class)
+	fun handleWithdrawFailure(ex: WithdrawWebException): ProblemDetail =
+		when (val failure = ex.failure) {
+			is WithdrawResult.Failure.CurrencyMismatch -> {
 				ProblemDetail.forStatusAndDetail(
 					HttpStatus.UNPROCESSABLE_CONTENT,
-					e.message,
+					"Currency mismatch; account currency is ${failure.accountCurrency}, " +
+						"but ${failure.requestedCurrency} was requested",
+				)
+			}
+
+			is WithdrawResult.Failure.InsufficientFunds -> {
+				ProblemDetail.forStatusAndDetail(
+					HttpStatus.UNPROCESSABLE_CONTENT,
+					"Insufficient funds; requested ${failure.requested}, " +
+						"but only ${failure.available} is available on the account",
 				)
 			}
 		}
 }
+
+class WithdrawWebException(
+	val failure: WithdrawResult.Failure,
+) : RuntimeException()

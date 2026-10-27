@@ -1,13 +1,13 @@
 package com.example.paymentservice.account.application.service
 
 import com.example.paymentservice.account.domain.model.Account
-import com.example.paymentservice.account.domain.model.AccountException
+import com.example.paymentservice.account.domain.model.WithdrawResult
 import com.example.paymentservice.account.domain.port.incoming.WithdrawCommand
 import com.example.paymentservice.account.domain.port.outgoing.AccountRepositoryPort
 import com.example.paymentservice.common.domain.model.CustomerId
 import com.example.paymentservice.common.domain.model.of
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
@@ -39,9 +39,11 @@ class WithdrawServiceTest {
 		val result = withdrawService(command)
 
 		// Then
-		result.balance.amount shouldBe BigDecimal("60.00")
-		result.balance.currency shouldBe pln
-		result.customerId shouldBe customerId
+		result.shouldBeInstanceOf<WithdrawResult.Success> { (account) ->
+			account.balance.amount shouldBe BigDecimal("60.00")
+			account.balance.currency shouldBe pln
+			account.customerId shouldBe customerId
+		}
 		verify(accountRepository).findByCustomerIdAndCurrency(customerId, pln)
 		verify(accountRepository).save(any())
 	}
@@ -54,11 +56,11 @@ class WithdrawServiceTest {
 
 		val command = WithdrawCommand(customerId, BigDecimal("50.00") of pln)
 
-		// When & Then
-		shouldThrow<AccountException.InsufficientFunds> {
-			withdrawService(command)
-		}
+		// When
+		val result = withdrawService(command)
 
+		// Then
+		result.shouldBeInstanceOf<WithdrawResult.Failure.InsufficientFunds>()
 		verify(accountRepository).findByCustomerIdAndCurrency(customerId, pln)
 		verify(accountRepository, never()).save(any())
 	}
@@ -70,11 +72,11 @@ class WithdrawServiceTest {
 
 		val command = WithdrawCommand(customerId, BigDecimal("10.00") of pln)
 
-		// When & Then
-		shouldThrow<AccountException.InsufficientFunds> {
-			withdrawService(command)
-		}
+		// When
+		val result = withdrawService(command)
 
+		// Then
+		result.shouldBeInstanceOf<WithdrawResult.Failure.InsufficientFunds>()
 		verify(accountRepository).findByCustomerIdAndCurrency(customerId, pln)
 		verify(accountRepository, never()).save(any())
 	}

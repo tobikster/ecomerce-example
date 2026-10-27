@@ -1,8 +1,8 @@
 package com.example.paymentservice.account.infrastructure.rest
 
 import com.example.paymentservice.account.domain.model.Account
-import com.example.paymentservice.account.domain.model.AccountException
 import com.example.paymentservice.account.domain.model.AccountId
+import com.example.paymentservice.account.domain.model.WithdrawResult
 import com.example.paymentservice.account.domain.port.incoming.DepositUseCase
 import com.example.paymentservice.account.domain.port.incoming.GetAccountsQuery
 import com.example.paymentservice.account.domain.port.incoming.GetAccountsUseCase
@@ -17,7 +17,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.then
 import org.mockito.kotlin.willReturn
-import org.mockito.kotlin.willThrow
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.context.annotation.Import
@@ -170,7 +169,7 @@ class AccountRestControllerTest(
 				customerId = customerId,
 				balance = BigDecimal("100.00") of pln,
 			)
-		given { withdrawUseCase.invoke(any()) } willReturn { account }
+		given { withdrawUseCase.invoke(any()) } willReturn { WithdrawResult.Success(account) }
 
 		val requestBody = createWithdrawRequest()
 
@@ -264,12 +263,12 @@ class AccountRestControllerTest(
 	@Test
 	fun `should return 422 Unprocessable Content when account has insufficient funds`() {
 		// Given
-		val insufficientFundsException =
-			AccountException.InsufficientFunds(
-				requested = BigDecimal("150.00") of pln,
-				available = BigDecimal("50.00") of pln,
+		given { withdrawUseCase.invoke(any()) } willReturn {
+			WithdrawResult.Failure.InsufficientFunds(
+				BigDecimal("150.00") of pln,
+				BigDecimal("50.00") of pln,
 			)
-		given { withdrawUseCase.invoke(any()) } willThrow { insufficientFundsException }
+		}
 
 		val requestBody = createWithdrawRequest(amount = BigDecimal("150.00"))
 

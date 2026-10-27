@@ -1,6 +1,7 @@
 package com.example.paymentservice.payment.application.service
 
-import com.example.paymentservice.account.domain.model.AccountException
+import com.example.paymentservice.account.domain.model.WithdrawResult
+import com.example.paymentservice.account.domain.model.fold
 import com.example.paymentservice.account.domain.port.incoming.WithdrawCommand
 import com.example.paymentservice.account.domain.port.incoming.WithdrawUseCase
 import com.example.paymentservice.payment.domain.model.Payment
@@ -20,12 +21,25 @@ class ProcessOrderPaymentService(
 		if (paymentRepository.findByOrderId(command.orderId) != null) return
 
 		val payment =
-			try {
-				val account = withdraw(WithdrawCommand(command.customerId, command.amount))
-				Payment.completed(command.orderId, account.customerId, command.amount)
-			} catch (e: AccountException.InsufficientFunds) {
-				Payment.failed(command.orderId, command.customerId, command.amount, e.message)
-			}
+			withdraw(WithdrawCommand(command.customerId, command.amount))
+				.fold(
+					onSuccess = { (account) ->
+						Payment.completed(command.orderId, account.customerId, command.amount)
+					},
+					onFailure = {
+						val failureReason =
+							when (it) {
+								is WithdrawResult.Failure.CurrencyMismatch -> {
+									"Currency mismatch; account currency: ${it.accountCurrency}, requestedCurrency: ${it.requestedCurrency}"
+								}
+
+								is WithdrawResult.Failure.InsufficientFunds -> {
+									"Insufficient funds; requested ${it.requested}, but only ${it.available} is available"
+								}
+							}
+						Payment.failed(command.orderId, command.customerId, command.amount, failureReason)
+					},
+				)
 
 		paymentRepository.save(payment)
 	}
