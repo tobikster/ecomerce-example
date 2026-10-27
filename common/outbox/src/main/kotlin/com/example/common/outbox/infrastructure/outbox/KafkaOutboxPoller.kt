@@ -1,6 +1,5 @@
-package com.example.orderservice.infrastructure.outbox
+package com.example.common.outbox.infrastructure.outbox
 
-import com.example.orderservice.order.infrastructure.outbox.OrderOutboxEventPublisher
 import jakarta.transaction.Transactional
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.springframework.kafka.KafkaException
@@ -23,7 +22,7 @@ class KafkaOutboxPoller(
 		val eventsToProcess = outboxRepository.findUnprocessedEvents(EVENTS_BATCH_SIZE)
 		buildList {
 			eventsToProcess.forEach { event ->
-				val topic = getKafkaTopic(event.aggregateType)
+				val topic = event.topic
 
 				try {
 					@Suppress("MagicNumber")
@@ -65,9 +64,3 @@ class KafkaOutboxPoller(
 		const val EVENTS_BATCH_SIZE = 50
 	}
 }
-
-private fun getKafkaTopic(aggregateType: String) =
-	when (aggregateType) {
-		OrderOutboxEventPublisher.AGGREGATE_TYPE -> "orders.events"
-		else -> error("Unexpected aggregate type: $aggregateType")
-	}

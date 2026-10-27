@@ -1,5 +1,8 @@
 package com.example.orderservice.infrastructure.outbox
 
+import com.example.common.outbox.infrastructure.outbox.KafkaOutboxPoller
+import com.example.common.outbox.infrastructure.outbox.OutboxEvent
+import com.example.common.outbox.infrastructure.outbox.OutboxRepository
 import com.example.orderservice.order.infrastructure.outbox.OrderOutboxEventPublisher
 import io.kotest.matchers.shouldBe
 import org.apache.kafka.clients.producer.ProducerRecord
@@ -196,7 +199,7 @@ class KafkaOutboxPollerTest {
 	private fun createOutboxEvent(
 		id: UUID = UUID.randomUUID(),
 		aggregateId: String = "event_1",
-		aggregateType: String = OrderOutboxEventPublisher.AGGREGATE_TYPE,
+		topic: String = OrderOutboxEventPublisher.TOPIC,
 		eventType: String = OrderOutboxEventPublisher.EVENT_TYPE_ORDER_CREATED,
 		createdAt: Instant = Instant.now(),
 		payload: String = "payload",
@@ -205,7 +208,7 @@ class KafkaOutboxPollerTest {
 	) = OutboxEvent(
 		id = id,
 		aggregateId = aggregateId,
-		aggregateType = aggregateType,
+		topic = topic,
 		eventType = eventType,
 		createdAt = createdAt,
 		payload = payload,

@@ -1,4 +1,4 @@
-package com.example.orderservice.infrastructure.outbox
+package com.example.common.outbox.infrastructure.outbox
 
 import java.time.Instant
 import java.util.UUID
@@ -6,7 +6,7 @@ import java.util.UUID
 data class OutboxEvent(
 	val id: UUID = UUID.randomUUID(),
 	val aggregateId: String,
-	val aggregateType: String,
+	val topic: String,
 	val eventType: String,
 	val createdAt: Instant = Instant.now(),
 	val payload: String,

@@ -1,4 +1,4 @@
-package com.example.orderservice.infrastructure.outbox
+package com.example.common.outbox.infrastructure.outbox
 
 import org.springframework.jdbc.core.simple.JdbcClient
 import org.springframework.stereotype.Repository
@@ -13,12 +13,12 @@ class OutboxRepository(
 		jdbcClient
 			.sql(
 				"""
-				INSERT INTO outbox_events (id, aggregate_id, aggregate_type, event_type, created_at, payload, retry_count, last_error)
-				VALUES (:id, :aggregateId, :aggregateType, :eventType, :createdAt, :payload, :retryCount, :lastError);
+				INSERT INTO outbox_events (id, aggregate_id, topic, event_type, created_at, payload, retry_count, last_error)
+				VALUES (:id, :aggregateId, :topic, :eventType, :createdAt, :payload, :retryCount, :lastError);
 				""".trimIndent(),
 			).param("id", event.id)
 			.param("aggregateId", event.aggregateId)
-			.param("aggregateType", event.aggregateType)
+			.param("topic", event.topic)
 			.param("eventType", event.eventType)
 			.param("createdAt", Timestamp.from(event.createdAt))
 			.param("payload", event.payload)
@@ -31,7 +31,7 @@ class OutboxRepository(
 		jdbcClient
 			.sql(
 				"""
-				SELECT id, aggregate_id, aggregate_type, event_type, created_at, payload, retry_count, last_error
+				SELECT id, aggregate_id, topic, event_type, created_at, payload, retry_count, last_error
 				FROM outbox_events
 				ORDER BY created_at ASC
 				LIMIT :batchSize
@@ -42,7 +42,7 @@ class OutboxRepository(
 				OutboxEvent(
 					id = result.getObject("id", UUID::class.java),
 					aggregateId = result.getString("aggregate_id"),
-					aggregateType = result.getString("aggregate_type"),
+					topic = result.getString("topic"),
 					eventType = result.getString("event_type"),
 					createdAt = result.getTimestamp("created_at").toInstant(),
 					payload = result.getString("payload"),
