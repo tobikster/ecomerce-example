@@ -5,8 +5,10 @@ import com.example.paymentservice.account.domain.model.fold
 import com.example.paymentservice.account.domain.port.incoming.WithdrawCommand
 import com.example.paymentservice.account.domain.port.incoming.WithdrawUseCase
 import com.example.paymentservice.payment.domain.model.Payment
+import com.example.paymentservice.payment.domain.model.toEvent
 import com.example.paymentservice.payment.domain.port.incoming.ProcessOrderPaymentCommand
 import com.example.paymentservice.payment.domain.port.incoming.ProcessOrderPaymentUseCase
+import com.example.paymentservice.payment.domain.port.outgoing.PaymentOutboxPublisherPort
 import com.example.paymentservice.payment.domain.port.outgoing.PaymentRepositoryPort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -15,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional
 class ProcessOrderPaymentService(
 	private val paymentRepository: PaymentRepositoryPort,
 	private val withdraw: WithdrawUseCase,
+	private val paymentEventsPublisher: PaymentOutboxPublisherPort,
 ) : ProcessOrderPaymentUseCase {
 	@Transactional
 	override fun invoke(command: ProcessOrderPaymentCommand) {
@@ -41,6 +44,8 @@ class ProcessOrderPaymentService(
 					},
 				)
 
-		paymentRepository.save(payment)
+		val savedPayment = paymentRepository.save(payment)
+
+		paymentEventsPublisher.publish(savedPayment.toEvent())
 	}
 }

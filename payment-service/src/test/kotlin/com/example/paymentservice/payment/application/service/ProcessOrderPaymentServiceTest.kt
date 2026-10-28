@@ -8,12 +8,15 @@ import com.example.paymentservice.common.domain.model.CustomerId
 import com.example.paymentservice.common.domain.model.OrderId
 import com.example.paymentservice.common.domain.model.of
 import com.example.paymentservice.payment.domain.model.Payment
+import com.example.paymentservice.payment.domain.model.PaymentEvent
 import com.example.paymentservice.payment.domain.model.PaymentStatus
 import com.example.paymentservice.payment.domain.port.incoming.ProcessOrderPaymentCommand
+import com.example.paymentservice.payment.domain.port.outgoing.PaymentOutboxPublisherPort
 import com.example.paymentservice.payment.domain.port.outgoing.PaymentRepositoryPort
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.types.shouldBeInstanceOf
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.check
@@ -30,7 +33,8 @@ import java.util.UUID
 class ProcessOrderPaymentServiceTest {
 	private val paymentRepository: PaymentRepositoryPort = mock()
 	private val withdraw: WithdrawUseCase = mock()
-	private val service = ProcessOrderPaymentService(paymentRepository, withdraw)
+	private val paymentEventsPublisher: PaymentOutboxPublisherPort = mock()
+	private val service = ProcessOrderPaymentService(paymentRepository, withdraw, paymentEventsPublisher)
 
 	private val pln = Currency.getInstance("PLN")
 	private val customerId = CustomerId("cust_123")
@@ -45,6 +49,7 @@ class ProcessOrderPaymentServiceTest {
 
 		given { paymentRepository.findByOrderId(orderId) } willReturn { null }
 		given { withdraw(WithdrawCommand(customerId, amount)) } willReturn { WithdrawResult.Success(account) }
+		given { paymentRepository.save(any()) }.willAnswer { it.getArgument(0) }
 
 		// When
 		service(command)
@@ -57,6 +62,15 @@ class ProcessOrderPaymentServiceTest {
 				payment.amount shouldBe amount
 				payment.status shouldBe PaymentStatus.COMPLETED
 				payment.failureReason.shouldBeNull()
+			},
+		)
+
+		verify(paymentEventsPublisher).publish(
+			check { event ->
+				event.shouldBeInstanceOf<PaymentEvent.Completed> { completed ->
+					completed.orderId shouldBe orderId
+					completed.amount shouldBe amount
+				}
 			},
 		)
 	}
@@ -73,6 +87,7 @@ class ProcessOrderPaymentServiceTest {
 				available = BigDecimal("50.00") of pln,
 			)
 		}
+		given { paymentRepository.save(any()) }.willAnswer { it.getArgument(0) }
 
 		// When
 		service(command)
@@ -85,6 +100,16 @@ class ProcessOrderPaymentServiceTest {
 				payment.amount shouldBe amount
 				payment.status shouldBe PaymentStatus.FAILED
 				payment.failureReason shouldContain "Insufficient funds"
+			},
+		)
+
+		verify(paymentEventsPublisher).publish(
+			check { event ->
+				event.shouldBeInstanceOf<PaymentEvent.Failed> { failed ->
+					failed.orderId shouldBe orderId
+					failed.amount shouldBe amount
+					failed.failureReason shouldContain "Insufficient funds"
+				}
 			},
 		)
 	}
@@ -103,5 +128,6 @@ class ProcessOrderPaymentServiceTest {
 		// Then
 		then(withdraw).shouldHaveNoInteractions()
 		verify(paymentRepository, never()).save(any())
+		then(paymentEventsPublisher).shouldHaveNoInteractions()
 	}
 }
