@@ -1,5 +1,9 @@
 package com.example.paymentservice.account.domain.model
 
+import arrow.core.Either
+import arrow.core.raise.either
+import com.example.paymentservice.common.domain.model.CustomerId
+import com.example.paymentservice.common.domain.model.Money
 import java.time.Instant
 import java.util.Currency
 import java.util.UUID
@@ -22,20 +26,21 @@ data class Account private constructor(
 		)
 	}
 
-	fun withdraw(funds: Money): Account {
-		require(balance.currency == funds.currency) {
-			"Currency mismatch: cannot withdraw ${funds.currency} from account with ${balance.currency}!"
-		}
+	fun withdraw(funds: Money): Either<WithdrawFailure, Account> =
+		either {
+			if (balance.currency != funds.currency) {
+				raise(WithdrawFailure.CurrencyMismatch(balance.currency, funds.currency))
+			}
 
-		if (balance.amount < funds.amount) {
-			throw AccountException.InsufficientFunds(requested = funds, available = balance)
-		}
+			if (balance.amount < funds.amount) {
+				raise(WithdrawFailure.InsufficientFunds(requested = funds, available = balance))
+			}
 
-		return copy(
-			balance = balance - funds,
-			updatedAt = Instant.now(),
-		)
-	}
+			copy(
+				balance = balance - funds,
+				updatedAt = Instant.now(),
+			)
+		}
 
 	companion object {
 		fun create(
@@ -67,12 +72,3 @@ data class Account private constructor(
 value class AccountId(
 	val value: UUID = UUID.randomUUID(),
 )
-
-@JvmInline
-value class CustomerId(
-	val value: String,
-) {
-	init {
-		require(value.isNotBlank()) { "Customer ID cannot be blank" }
-	}
-}

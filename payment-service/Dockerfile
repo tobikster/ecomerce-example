@@ -5,11 +5,13 @@ WORKDIR /workspace
 # Copy gradle wrapper and configuration files first to leverage Docker layer caching
 COPY gradlew settings.gradle.kts build.gradle.kts gradle.properties* ./
 COPY gradle gradle
+COPY common/outbox/build.gradle.kts common/outbox/
 COPY payment-service/build.gradle.kts payment-service/
 
 RUN ./gradlew :payment-service:dependencies --no-daemon || true
 
 # Copy source code and build production jar
+COPY common/outbox/src common/outbox/src
 COPY payment-service/src payment-service/src
 RUN ./gradlew :payment-service:bootJar -x test --no-daemon
 

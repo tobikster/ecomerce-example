@@ -18,5 +18,6 @@ fun includeIfExists(vararg projectPaths: String) {
 	}
 }
 
+includeIfExists(":common:outbox")
 includeIfExists(":order-service")
 includeIfExists(":payment-service")

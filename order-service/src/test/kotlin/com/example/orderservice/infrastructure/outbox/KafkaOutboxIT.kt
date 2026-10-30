@@ -1,5 +1,7 @@
 package com.example.orderservice.infrastructure.outbox
 
+import com.example.common.outbox.infrastructure.outbox.OutboxEvent
+import com.example.common.outbox.infrastructure.outbox.OutboxRepository
 import com.example.orderservice.order.domain.model.CustomerId
 import com.example.orderservice.order.domain.model.OrderCreatedEvent
 import com.example.orderservice.order.domain.model.OrderId
@@ -158,7 +160,7 @@ class KafkaOutboxIT(
 			OutboxEvent(
 				id = eventId,
 				aggregateId = "order_999",
-				aggregateType = OrderOutboxEventPublisher.AGGREGATE_TYPE,
+				topic = OrderOutboxEventPublisher.TOPIC,
 				eventType = OrderOutboxEventPublisher.EVENT_TYPE_ORDER_CREATED,
 				payload = """{"orderId":"$eventId"}""",
 				retryCount = 0,

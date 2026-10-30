@@ -1,7 +1,7 @@
 package com.example.orderservice.order.infrastructure.outbox
 
-import com.example.orderservice.infrastructure.outbox.OutboxEvent
-import com.example.orderservice.infrastructure.outbox.OutboxRepository
+import com.example.common.outbox.infrastructure.outbox.OutboxEvent
+import com.example.common.outbox.infrastructure.outbox.OutboxRepository
 import com.example.orderservice.order.domain.model.OrderCreatedEvent
 import com.example.orderservice.order.domain.port.outgoing.OrderEventPublisherPort
 import com.example.orderservice.order.infrastructure.kafka.dto.toDto
@@ -18,7 +18,7 @@ class OrderOutboxEventPublisher(
 		val outboxEvent =
 			OutboxEvent(
 				aggregateId = event.orderId.value.toString(),
-				aggregateType = AGGREGATE_TYPE,
+				topic = TOPIC,
 				eventType = EVENT_TYPE_ORDER_CREATED,
 				payload = payload,
 			)
@@ -27,7 +27,7 @@ class OrderOutboxEventPublisher(
 	}
 
 	companion object {
-		const val AGGREGATE_TYPE = "Order"
+		const val TOPIC = "orders.events"
 		const val EVENT_TYPE_ORDER_CREATED = "OrderCreated"
 	}
 }

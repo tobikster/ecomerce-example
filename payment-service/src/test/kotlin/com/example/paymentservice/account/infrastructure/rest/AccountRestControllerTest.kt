@@ -1,14 +1,16 @@
 package com.example.paymentservice.account.infrastructure.rest
 
+import arrow.core.left
+import arrow.core.right
 import com.example.paymentservice.account.domain.model.Account
-import com.example.paymentservice.account.domain.model.AccountException
 import com.example.paymentservice.account.domain.model.AccountId
-import com.example.paymentservice.account.domain.model.CustomerId
-import com.example.paymentservice.account.domain.model.of
+import com.example.paymentservice.account.domain.model.WithdrawFailure
 import com.example.paymentservice.account.domain.port.incoming.DepositUseCase
 import com.example.paymentservice.account.domain.port.incoming.GetAccountsQuery
 import com.example.paymentservice.account.domain.port.incoming.GetAccountsUseCase
 import com.example.paymentservice.account.domain.port.incoming.WithdrawUseCase
+import com.example.paymentservice.common.domain.model.CustomerId
+import com.example.paymentservice.common.domain.model.of
 import com.example.paymentservice.infrastructure.rest.GlobalRestExceptionHandler
 import org.hamcrest.Matchers.containsString
 import org.hamcrest.Matchers.hasSize
@@ -17,7 +19,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.then
 import org.mockito.kotlin.willReturn
-import org.mockito.kotlin.willThrow
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.context.annotation.Import
@@ -170,7 +171,7 @@ class AccountRestControllerTest(
 				customerId = customerId,
 				balance = BigDecimal("100.00") of pln,
 			)
-		given { withdrawUseCase.invoke(any()) } willReturn { account }
+		given { withdrawUseCase.invoke(any()) } willReturn { account.right() }
 
 		val requestBody = createWithdrawRequest()
 
@@ -264,12 +265,13 @@ class AccountRestControllerTest(
 	@Test
 	fun `should return 422 Unprocessable Content when account has insufficient funds`() {
 		// Given
-		val insufficientFundsException =
-			AccountException.InsufficientFunds(
-				requested = BigDecimal("150.00") of pln,
-				available = BigDecimal("50.00") of pln,
-			)
-		given { withdrawUseCase.invoke(any()) } willThrow { insufficientFundsException }
+		given { withdrawUseCase.invoke(any()) } willReturn {
+			WithdrawFailure
+				.InsufficientFunds(
+					BigDecimal("150.00") of pln,
+					BigDecimal("50.00") of pln,
+				).left()
+		}
 
 		val requestBody = createWithdrawRequest(amount = BigDecimal("150.00"))
 

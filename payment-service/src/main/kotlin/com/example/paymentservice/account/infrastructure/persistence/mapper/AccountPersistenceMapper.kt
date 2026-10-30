@@ -2,9 +2,9 @@ package com.example.paymentservice.account.infrastructure.persistence.mapper
 
 import com.example.paymentservice.account.domain.model.Account
 import com.example.paymentservice.account.domain.model.AccountId
-import com.example.paymentservice.account.domain.model.CustomerId
-import com.example.paymentservice.account.domain.model.of
 import com.example.paymentservice.account.infrastructure.persistence.entity.AccountEntity
+import com.example.paymentservice.common.domain.model.CustomerId
+import com.example.paymentservice.common.domain.model.of
 
 fun Account.toEntity() =
 	AccountEntity(

@@ -1,8 +1,8 @@
 package com.example.paymentservice.account.infrastructure.rest
 
+import arrow.core.getOrElse
 import com.example.paymentservice.account.domain.model.Account
-import com.example.paymentservice.account.domain.model.AccountException
-import com.example.paymentservice.account.domain.model.CustomerId
+import com.example.paymentservice.account.domain.model.WithdrawFailure
 import com.example.paymentservice.account.domain.port.incoming.DepositUseCase
 import com.example.paymentservice.account.domain.port.incoming.GetAccountsQuery
 import com.example.paymentservice.account.domain.port.incoming.GetAccountsUseCase
@@ -12,6 +12,7 @@ import com.example.paymentservice.account.infrastructure.rest.dto.DepositRequest
 import com.example.paymentservice.account.infrastructure.rest.dto.WithdrawRequest
 import com.example.paymentservice.account.infrastructure.rest.dto.toCommand
 import com.example.paymentservice.account.infrastructure.rest.dto.toResponse
+import com.example.paymentservice.common.domain.model.CustomerId
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
@@ -65,9 +66,10 @@ class AccountRestController(
 		@RequestBody @Valid request: WithdrawRequest,
 	): ResponseEntity<AccountResponse> {
 		val command = request.toCommand(customerId)
-		val response = withdraw(command).toResponse()
 
-		return ResponseEntity.ok(response)
+		val account = withdraw(command).getOrElse { throw WithdrawWebException(it) }
+
+		return ResponseEntity.ok(account.toResponse())
 	}
 
 	@GetMapping("/{customerId}")
@@ -80,14 +82,27 @@ class AccountRestController(
 		return ResponseEntity.ok(response)
 	}
 
-	@ExceptionHandler(AccountException::class)
-	fun handleAccountException(e: AccountException): ProblemDetail =
-		when (e) {
-			is AccountException.InsufficientFunds -> {
+	@ExceptionHandler(WithdrawWebException::class)
+	fun handleWithdrawFailure(ex: WithdrawWebException): ProblemDetail =
+		when (val failure = ex.failure) {
+			is WithdrawFailure.CurrencyMismatch -> {
 				ProblemDetail.forStatusAndDetail(
 					HttpStatus.UNPROCESSABLE_CONTENT,
-					e.message,
+					"Currency mismatch; account currency is ${failure.accountCurrency}, " +
+						"but ${failure.requestedCurrency} was requested",
+				)
+			}
+
+			is WithdrawFailure.InsufficientFunds -> {
+				ProblemDetail.forStatusAndDetail(
+					HttpStatus.UNPROCESSABLE_CONTENT,
+					"Insufficient funds; requested ${failure.requested}, " +
+						"but only ${failure.available} is available on the account",
 				)
 			}
 		}
 }
+
+class WithdrawWebException(
+	val failure: WithdrawFailure,
+) : RuntimeException()
