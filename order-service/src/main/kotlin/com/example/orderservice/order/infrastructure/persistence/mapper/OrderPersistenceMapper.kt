@@ -4,6 +4,7 @@ import com.example.orderservice.order.domain.model.CustomerId
 import com.example.orderservice.order.domain.model.Money
 import com.example.orderservice.order.domain.model.Order
 import com.example.orderservice.order.domain.model.OrderId
+import com.example.orderservice.order.domain.model.PaymentId
 import com.example.orderservice.order.infrastructure.persistence.entity.OrderEntity
 
 fun Order.toEntity() =
@@ -13,6 +14,7 @@ fun Order.toEntity() =
 		totalAmount = totalAmount.amount,
 		currency = totalAmount.currency,
 		status = status,
+		paymentId = paymentId?.value,
 		createdAt = createdAt,
 		updatedAt = updatedAt,
 	)
@@ -23,6 +25,7 @@ fun OrderEntity.toDomain() =
 		customerId = CustomerId(customerId),
 		totalAmount = Money(totalAmount, currency),
 		status = status,
+		paymentId = paymentId?.let(::PaymentId),
 		createdAt = createdAt,
 		updatedAt = updatedAt,
 	)

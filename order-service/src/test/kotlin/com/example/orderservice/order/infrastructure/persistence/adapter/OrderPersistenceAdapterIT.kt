@@ -74,6 +74,7 @@ class OrderPersistenceAdapterIT
 					totalAmount = "50.00".toBigDecimal(),
 					currency = Currency.getInstance("PLN"),
 					status = OrderStatus.CREATED,
+					paymentId = null,
 					createdAt = Instant.now(),
 					updatedAt = Instant.now(),
 				)
@@ -112,6 +113,7 @@ class OrderPersistenceAdapterIT
 						totalAmount = "50.00".toBigDecimal(),
 						currency = Currency.getInstance("PLN"),
 						status = OrderStatus.CREATED,
+						paymentId = null,
 						createdAt = Instant.now(),
 						updatedAt = Instant.now(),
 					),
@@ -121,6 +123,7 @@ class OrderPersistenceAdapterIT
 						totalAmount = "24.99".toBigDecimal(),
 						currency = Currency.getInstance("EUR"),
 						status = OrderStatus.COMPLETED,
+						paymentId = null,
 						createdAt = Instant.now(),
 						updatedAt = Instant.now(),
 					),
@@ -148,6 +151,7 @@ class OrderPersistenceAdapterIT
 					totalAmount = "50.00".toBigDecimal(),
 					currency = Currency.getInstance("PLN"),
 					status = OrderStatus.CREATED,
+					paymentId = null,
 					createdAt = Instant.now(),
 					updatedAt = Instant.now(),
 				),
@@ -157,6 +161,7 @@ class OrderPersistenceAdapterIT
 					totalAmount = "24.99".toBigDecimal(),
 					currency = Currency.getInstance("EUR"),
 					status = OrderStatus.COMPLETED,
+					paymentId = null,
 					createdAt = Instant.now(),
 					updatedAt = Instant.now(),
 				),
@@ -166,6 +171,7 @@ class OrderPersistenceAdapterIT
 					totalAmount = "150.00".toBigDecimal(),
 					currency = Currency.getInstance("PLN"),
 					status = OrderStatus.CANCELLED,
+					paymentId = null,
 					createdAt = Instant.now(),
 					updatedAt = Instant.now(),
 				),
@@ -183,6 +189,7 @@ class OrderPersistenceAdapterIT
 		companion object {
 			@Container
 			@ServiceConnection
-			val postgres = PostgreSQLContainer("postgres:16-alpine")
+			@Suppress("UnusedPrivateProperty")
+			private val postgres = PostgreSQLContainer("postgres:17.0")
 		}
 	}

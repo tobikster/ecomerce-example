@@ -136,6 +136,7 @@ class OrderRestControllerTest(
 				customerId = CustomerId("customer_123"),
 				totalAmount = "150.99".toBigDecimal() of "PLN",
 				status = OrderStatus.CREATED,
+				paymentId = null,
 				createdAt = Instant.now(),
 				updatedAt = Instant.now(),
 			)
@@ -191,6 +192,7 @@ class OrderRestControllerTest(
 					customerId = CustomerId("customer_123"),
 					totalAmount = "100.00".toBigDecimal() of "PLN",
 					status = OrderStatus.CREATED,
+					paymentId = null,
 					createdAt = Instant.now(),
 					updatedAt = Instant.now(),
 				),
@@ -199,6 +201,7 @@ class OrderRestControllerTest(
 					customerId = CustomerId("customer_123"),
 					totalAmount = "75.50".toBigDecimal() of "EUR",
 					status = OrderStatus.PAID,
+					paymentId = null,
 					createdAt = Instant.now(),
 					updatedAt = Instant.now(),
 				),

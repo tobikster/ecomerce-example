@@ -12,42 +12,37 @@ import java.time.Instant
 import java.util.Currency
 import java.util.UUID
 
-@Suppress("LongParameterList")
 @Entity
 @Table(name = "orders")
+@Suppress("LongParameterList")
 class OrderEntity(
 	@Id
-	@Column(name = "id", nullable = false, updatable = false)
+	@Column(name = "id", nullable = false)
 	val id: UUID,
 	@Column(name = "customer_id", nullable = false)
-	var customerId: String,
-	@Column(name = "total_amount", nullable = false)
-	var totalAmount: BigDecimal,
-	@Column(name = "currency", nullable = false)
-	var currency: Currency,
+	val customerId: String,
+	@Column(name = "total_amount", nullable = false, precision = 19, scale = 2)
+	val totalAmount: BigDecimal,
+	@Column(name = "currency", nullable = false, length = 3)
+	val currency: Currency,
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false)
 	var status: OrderStatus,
+	@Column(name = "payment_id")
+	var paymentId: UUID?,
 	@Column(name = "created_at", nullable = false, updatable = false)
 	val createdAt: Instant,
 	@Column(name = "updated_at", nullable = false)
 	var updatedAt: Instant,
 ) {
-	override fun equals(other: Any?): Boolean {
-		if (this === other) return true
-		if (other !is OrderEntity) return false
-		return id == other.id
-	}
-
-	override fun hashCode(): Int = id.hashCode()
-
-	override fun toString() =
+	override fun toString(): String =
 		"OrderEntity(" +
 			"id=$id, " +
 			"customerId=$customerId, " +
 			"totalAmount=$totalAmount, " +
 			"currency=$currency, " +
 			"status=$status, " +
+			"paymentId=$paymentId, " +
 			"createdAt=$createdAt, " +
 			"updatedAt=$updatedAt" +
 			")"

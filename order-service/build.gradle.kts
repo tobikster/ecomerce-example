@@ -33,6 +33,8 @@ dependencies {
 	implementation(libs.flyway.postgresql)
 	runtimeOnly(libs.postgresql)
 
+	implementation(libs.arrow)
+
 	implementation(libs.springdoc.openapi.webmvc.ui)
 
 	testImplementation(platform(libs.testcontainers.bom))

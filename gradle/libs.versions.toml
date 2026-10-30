@@ -1,4 +1,5 @@
 [versions]
+arrow = '2.3.0.1'
 detekt = '2.0.0-alpha.6'
 kotest = '5.9.1'
 kotlin = '2.4.10'
@@ -25,6 +26,9 @@ postgresql = { module = 'org.postgresql:postgresql' }
 # Kotlin
 jackson-kotlin = { module = 'tools.jackson.module:jackson-module-kotlin' }
 kotlin-reflect = { module = 'org.jetbrains.kotlin:kotlin-reflect' }
+
+# Utils
+arrow = { module = 'io.arrow-kt:arrow-core', version.ref = 'arrow' }
 
 # Testing
 junit-platform-launcher = { module = 'org.junit.platform:junit-platform-launcher' }
