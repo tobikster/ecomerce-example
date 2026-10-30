@@ -1,11 +1,13 @@
 package com.example.paymentservice.account.application.service
 
 import com.example.paymentservice.account.domain.model.Account
-import com.example.paymentservice.account.domain.model.WithdrawResult
+import com.example.paymentservice.account.domain.model.WithdrawFailure
 import com.example.paymentservice.account.domain.port.incoming.WithdrawCommand
 import com.example.paymentservice.account.domain.port.outgoing.AccountRepositoryPort
 import com.example.paymentservice.common.domain.model.CustomerId
 import com.example.paymentservice.common.domain.model.of
+import io.kotest.assertions.arrow.core.shouldBeLeft
+import io.kotest.assertions.arrow.core.shouldBeRight
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import org.junit.jupiter.api.Test
@@ -39,11 +41,10 @@ class WithdrawServiceTest {
 		val result = withdrawService(command)
 
 		// Then
-		result.shouldBeInstanceOf<WithdrawResult.Success> { (account) ->
-			account.balance.amount shouldBe BigDecimal("60.00")
-			account.balance.currency shouldBe pln
-			account.customerId shouldBe customerId
-		}
+		val account = result.shouldBeRight()
+		account.balance.amount shouldBe BigDecimal("60.00")
+		account.balance.currency shouldBe pln
+		account.customerId shouldBe customerId
 		verify(accountRepository).findByCustomerIdAndCurrency(customerId, pln)
 		verify(accountRepository).save(any())
 	}
@@ -60,7 +61,7 @@ class WithdrawServiceTest {
 		val result = withdrawService(command)
 
 		// Then
-		result.shouldBeInstanceOf<WithdrawResult.Failure.InsufficientFunds>()
+		result.shouldBeLeft().shouldBeInstanceOf<WithdrawFailure.InsufficientFunds>()
 		verify(accountRepository).findByCustomerIdAndCurrency(customerId, pln)
 		verify(accountRepository, never()).save(any())
 	}
@@ -76,7 +77,7 @@ class WithdrawServiceTest {
 		val result = withdrawService(command)
 
 		// Then
-		result.shouldBeInstanceOf<WithdrawResult.Failure.InsufficientFunds>()
+		result.shouldBeLeft().shouldBeInstanceOf<WithdrawFailure.InsufficientFunds>()
 		verify(accountRepository).findByCustomerIdAndCurrency(customerId, pln)
 		verify(accountRepository, never()).save(any())
 	}

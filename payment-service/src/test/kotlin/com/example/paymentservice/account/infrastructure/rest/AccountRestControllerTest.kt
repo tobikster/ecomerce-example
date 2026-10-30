@@ -1,8 +1,10 @@
 package com.example.paymentservice.account.infrastructure.rest
 
+import arrow.core.left
+import arrow.core.right
 import com.example.paymentservice.account.domain.model.Account
 import com.example.paymentservice.account.domain.model.AccountId
-import com.example.paymentservice.account.domain.model.WithdrawResult
+import com.example.paymentservice.account.domain.model.WithdrawFailure
 import com.example.paymentservice.account.domain.port.incoming.DepositUseCase
 import com.example.paymentservice.account.domain.port.incoming.GetAccountsQuery
 import com.example.paymentservice.account.domain.port.incoming.GetAccountsUseCase
@@ -169,7 +171,7 @@ class AccountRestControllerTest(
 				customerId = customerId,
 				balance = BigDecimal("100.00") of pln,
 			)
-		given { withdrawUseCase.invoke(any()) } willReturn { WithdrawResult.Success(account) }
+		given { withdrawUseCase.invoke(any()) } willReturn { account.right() }
 
 		val requestBody = createWithdrawRequest()
 
@@ -264,10 +266,11 @@ class AccountRestControllerTest(
 	fun `should return 422 Unprocessable Content when account has insufficient funds`() {
 		// Given
 		given { withdrawUseCase.invoke(any()) } willReturn {
-			WithdrawResult.Failure.InsufficientFunds(
-				BigDecimal("150.00") of pln,
-				BigDecimal("50.00") of pln,
-			)
+			WithdrawFailure
+				.InsufficientFunds(
+					BigDecimal("150.00") of pln,
+					BigDecimal("50.00") of pln,
+				).left()
 		}
 
 		val requestBody = createWithdrawRequest(amount = BigDecimal("150.00"))

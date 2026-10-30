@@ -1,7 +1,8 @@
 package com.example.paymentservice.account.infrastructure.rest
 
+import arrow.core.getOrElse
 import com.example.paymentservice.account.domain.model.Account
-import com.example.paymentservice.account.domain.model.WithdrawResult
+import com.example.paymentservice.account.domain.model.WithdrawFailure
 import com.example.paymentservice.account.domain.port.incoming.DepositUseCase
 import com.example.paymentservice.account.domain.port.incoming.GetAccountsQuery
 import com.example.paymentservice.account.domain.port.incoming.GetAccountsUseCase
@@ -66,11 +67,7 @@ class AccountRestController(
 	): ResponseEntity<AccountResponse> {
 		val command = request.toCommand(customerId)
 
-		val account =
-			when (val result = withdraw(command)) {
-				is WithdrawResult.Success -> result.account
-				is WithdrawResult.Failure -> throw WithdrawWebException(result)
-			}
+		val account = withdraw(command).getOrElse { throw WithdrawWebException(it) }
 
 		return ResponseEntity.ok(account.toResponse())
 	}
@@ -88,7 +85,7 @@ class AccountRestController(
 	@ExceptionHandler(WithdrawWebException::class)
 	fun handleWithdrawFailure(ex: WithdrawWebException): ProblemDetail =
 		when (val failure = ex.failure) {
-			is WithdrawResult.Failure.CurrencyMismatch -> {
+			is WithdrawFailure.CurrencyMismatch -> {
 				ProblemDetail.forStatusAndDetail(
 					HttpStatus.UNPROCESSABLE_CONTENT,
 					"Currency mismatch; account currency is ${failure.accountCurrency}, " +
@@ -96,7 +93,7 @@ class AccountRestController(
 				)
 			}
 
-			is WithdrawResult.Failure.InsufficientFunds -> {
+			is WithdrawFailure.InsufficientFunds -> {
 				ProblemDetail.forStatusAndDetail(
 					HttpStatus.UNPROCESSABLE_CONTENT,
 					"Insufficient funds; requested ${failure.requested}, " +
@@ -107,5 +104,5 @@ class AccountRestController(
 }
 
 class WithdrawWebException(
-	val failure: WithdrawResult.Failure,
+	val failure: WithdrawFailure,
 ) : RuntimeException()

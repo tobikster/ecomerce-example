@@ -1,7 +1,9 @@
 package com.example.paymentservice.payment.application.service
 
+import arrow.core.left
+import arrow.core.right
 import com.example.paymentservice.account.domain.model.Account
-import com.example.paymentservice.account.domain.model.WithdrawResult
+import com.example.paymentservice.account.domain.model.WithdrawFailure
 import com.example.paymentservice.account.domain.port.incoming.WithdrawCommand
 import com.example.paymentservice.account.domain.port.incoming.WithdrawUseCase
 import com.example.paymentservice.common.domain.model.CustomerId
@@ -48,7 +50,7 @@ class ProcessOrderPaymentServiceTest {
 		val account = Account.create(customerId, pln).deposit(BigDecimal("200.00") of pln)
 
 		given { paymentRepository.findByOrderId(orderId) } willReturn { null }
-		given { withdraw(WithdrawCommand(customerId, amount)) } willReturn { WithdrawResult.Success(account) }
+		given { withdraw(WithdrawCommand(customerId, amount)) } willReturn { account.right() }
 		given { paymentRepository.save(any()) }.willAnswer { it.getArgument(0) }
 
 		// When
@@ -82,10 +84,11 @@ class ProcessOrderPaymentServiceTest {
 
 		given { paymentRepository.findByOrderId(orderId) } willReturn { null }
 		given { withdraw(WithdrawCommand(customerId, amount)) } willReturn {
-			WithdrawResult.Failure.InsufficientFunds(
-				requested = amount,
-				available = BigDecimal("50.00") of pln,
-			)
+			WithdrawFailure
+				.InsufficientFunds(
+					requested = amount,
+					available = BigDecimal("50.00") of pln,
+				).left()
 		}
 		given { paymentRepository.save(any()) }.willAnswer { it.getArgument(0) }
 

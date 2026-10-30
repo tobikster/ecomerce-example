@@ -2,6 +2,7 @@
 arrow = '2.3.0.1'
 detekt = '2.0.0-alpha.6'
 kotest = '5.9.1'
+kotest-arrow = '2.0.0'
 kotlin = '2.4.10'
 ktlint = '14.2.0'
 mockito-kotlin = '6.4.0'
@@ -33,6 +34,7 @@ arrow = { module = 'io.arrow-kt:arrow-core', version.ref = 'arrow' }
 # Testing
 junit-platform-launcher = { module = 'org.junit.platform:junit-platform-launcher' }
 kotest-assertions = { module = 'io.kotest:kotest-assertions-core', version.ref = 'kotest' }
+kotest-arrow-matchers = { module = 'io.kotest.extensions:kotest-assertions-arrow', version.ref = 'kotest-arrow' }
 kotlin-junit5 = { module = 'org.jetbrains.kotlin:kotlin-test-junit5' }
 spring-boot-starter-test = { module = 'org.springframework.boot:spring-boot-starter-test' }
 spring-boot-starter-data-jpa-test = { module = 'org.springframework.boot:spring-boot-starter-data-jpa-test' }

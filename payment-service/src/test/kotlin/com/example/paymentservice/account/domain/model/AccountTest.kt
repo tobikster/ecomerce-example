@@ -2,9 +2,12 @@ package com.example.paymentservice.account.domain.model
 
 import com.example.paymentservice.common.domain.model.CustomerId
 import com.example.paymentservice.common.domain.model.of
+import io.kotest.assertions.arrow.core.shouldBeLeft
+import io.kotest.assertions.arrow.core.shouldBeRight
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.comparables.shouldBeGreaterThanOrEqualTo
 import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -106,7 +109,7 @@ class AccountTest {
 		val result = account.withdraw(BigDecimal("75.50") of pln)
 
 		// Then
-		result.shouldBeInstanceOf<WithdrawResult.Success> { (account) ->
+		result.shouldBeRight().should { account ->
 			account.balance shouldBe (BigDecimal("124.50") of pln)
 			account.updatedAt shouldBeGreaterThanOrEqualTo account.updatedAt
 		}
@@ -124,7 +127,7 @@ class AccountTest {
 		val result = account.withdraw(BigDecimal("50.01") of pln)
 
 		// Then
-		result.shouldBeInstanceOf<WithdrawResult.Failure.InsufficientFunds>()
+		result.shouldBeLeft().shouldBeInstanceOf<WithdrawFailure.InsufficientFunds>()
 	}
 
 	@Test
@@ -139,6 +142,6 @@ class AccountTest {
 		val result = account.withdraw(BigDecimal("10.00") of eur)
 
 		// Then
-		result.shouldBeInstanceOf<WithdrawResult.Failure.CurrencyMismatch>()
+		result.shouldBeLeft().shouldBeInstanceOf<WithdrawFailure.CurrencyMismatch>()
 	}
 }

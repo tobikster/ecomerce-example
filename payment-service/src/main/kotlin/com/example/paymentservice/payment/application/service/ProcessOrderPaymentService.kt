@@ -1,7 +1,6 @@
 package com.example.paymentservice.payment.application.service
 
-import com.example.paymentservice.account.domain.model.WithdrawResult
-import com.example.paymentservice.account.domain.model.fold
+import com.example.paymentservice.account.domain.model.WithdrawFailure
 import com.example.paymentservice.account.domain.port.incoming.WithdrawCommand
 import com.example.paymentservice.account.domain.port.incoming.WithdrawUseCase
 import com.example.paymentservice.payment.domain.model.Payment
@@ -26,21 +25,21 @@ class ProcessOrderPaymentService(
 		val payment =
 			withdraw(WithdrawCommand(command.customerId, command.amount))
 				.fold(
-					onSuccess = { (account) ->
-						Payment.completed(command.orderId, account.customerId, command.amount)
-					},
-					onFailure = {
+					ifLeft = {
 						val failureReason =
 							when (it) {
-								is WithdrawResult.Failure.CurrencyMismatch -> {
+								is WithdrawFailure.CurrencyMismatch -> {
 									"Currency mismatch; account currency: ${it.accountCurrency}, requestedCurrency: ${it.requestedCurrency}"
 								}
 
-								is WithdrawResult.Failure.InsufficientFunds -> {
+								is WithdrawFailure.InsufficientFunds -> {
 									"Insufficient funds; requested ${it.requested}, but only ${it.available} is available"
 								}
 							}
 						Payment.failed(command.orderId, command.customerId, command.amount, failureReason)
+					},
+					ifRight = { account ->
+						Payment.completed(command.orderId, account.customerId, command.amount)
 					},
 				)
 

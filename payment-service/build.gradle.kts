@@ -34,6 +34,8 @@ dependencies {
 
 	implementation(libs.spring.boot.starter.kafka)
 
+	implementation(libs.arrow)
+
 	implementation(libs.springdoc.openapi.webmvc.ui)
 
 	testImplementation(platform(libs.testcontainers.bom))
@@ -49,6 +51,7 @@ dependencies {
 	testImplementation(libs.mockito.kotlin)
 	testRuntimeOnly(libs.junit.platform.launcher)
 	testImplementation(libs.kotest.assertions)
+	testImplementation(libs.kotest.arrow.matchers)
 }
 
 kotlin {

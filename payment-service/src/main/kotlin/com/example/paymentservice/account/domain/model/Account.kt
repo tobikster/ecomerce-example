@@ -1,5 +1,7 @@
 package com.example.paymentservice.account.domain.model
 
+import arrow.core.Either
+import arrow.core.raise.either
 import com.example.paymentservice.common.domain.model.CustomerId
 import com.example.paymentservice.common.domain.model.Money
 import java.time.Instant
@@ -24,21 +26,21 @@ data class Account private constructor(
 		)
 	}
 
-	@Suppress("ReturnCount") // additional returns are only guard conditions
-	fun withdraw(funds: Money): WithdrawResult {
-		if (balance.currency != funds.currency) {
-			return WithdrawResult.Failure.CurrencyMismatch(balance.currency, funds.currency)
-		}
+	fun withdraw(funds: Money): Either<WithdrawFailure, Account> =
+		either {
+			if (balance.currency != funds.currency) {
+				raise(WithdrawFailure.CurrencyMismatch(balance.currency, funds.currency))
+			}
 
-		if (balance.amount < funds.amount) {
-			return WithdrawResult.Failure.InsufficientFunds(requested = funds, available = balance)
-		}
+			if (balance.amount < funds.amount) {
+				raise(WithdrawFailure.InsufficientFunds(requested = funds, available = balance))
+			}
 
-		return copy(
-			balance = balance - funds,
-			updatedAt = Instant.now(),
-		).let(WithdrawResult::Success)
-	}
+			copy(
+				balance = balance - funds,
+				updatedAt = Instant.now(),
+			)
+		}
 
 	companion object {
 		fun create(
