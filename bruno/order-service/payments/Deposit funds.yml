@@ -1,0 +1,36 @@
+info:
+  name: Deposit funds
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{BASE_URL_PAYMENTS}}/accounts/:customer_id/deposits"
+  params:
+    - name: customer_id
+      value: customer_123
+      type: path
+  body:
+    type: json
+    data: |-
+      {
+        "funds": {{funds}},
+        "currencyCode": "{{currency_code}}"
+      }
+  auth: inherit
+
+runtime:
+  variables:
+    - name: funds
+      value:
+        type: number
+        data: "100"
+    - name: currency_code
+      value: PLN
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

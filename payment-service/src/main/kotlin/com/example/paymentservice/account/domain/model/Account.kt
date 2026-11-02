@@ -1,0 +1,74 @@
+package com.example.paymentservice.account.domain.model
+
+import arrow.core.Either
+import arrow.core.raise.either
+import com.example.paymentservice.common.domain.model.CustomerId
+import com.example.paymentservice.common.domain.model.Money
+import java.time.Instant
+import java.util.Currency
+import java.util.UUID
+
+data class Account private constructor(
+	val id: AccountId,
+	val customerId: CustomerId,
+	val balance: Money,
+	val createdAt: Instant = Instant.now(),
+	val updatedAt: Instant = createdAt,
+) {
+	fun deposit(funds: Money): Account {
+		require(balance.currency == funds.currency) {
+			"Currency mismatch: cannot deposit ${funds.currency} to account with ${balance.currency}!"
+		}
+
+		return copy(
+			balance = balance + funds,
+			updatedAt = Instant.now(),
+		)
+	}
+
+	fun withdraw(funds: Money): Either<WithdrawFailure, Account> =
+		either {
+			if (balance.currency != funds.currency) {
+				raise(WithdrawFailure.CurrencyMismatch(balance.currency, funds.currency))
+			}
+
+			if (balance.amount < funds.amount) {
+				raise(WithdrawFailure.InsufficientFunds(requested = funds, available = balance))
+			}
+
+			copy(
+				balance = balance - funds,
+				updatedAt = Instant.now(),
+			)
+		}
+
+	companion object {
+		fun create(
+			customerId: CustomerId,
+			currency: Currency,
+		) = Account(
+			id = AccountId(),
+			customerId = customerId,
+			balance = Money.zero(currency),
+		)
+
+		fun restore(
+			id: AccountId,
+			customerId: CustomerId,
+			balance: Money,
+			createdAt: Instant = Instant.now(),
+			updatedAt: Instant = createdAt,
+		) = Account(
+			id = id,
+			customerId = customerId,
+			balance = balance,
+			createdAt = createdAt,
+			updatedAt = updatedAt,
+		)
+	}
+}
+
+@JvmInline
+value class AccountId(
+	val value: UUID = UUID.randomUUID(),
+)

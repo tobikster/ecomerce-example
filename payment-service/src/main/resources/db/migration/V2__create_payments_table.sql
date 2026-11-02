@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS payments (
+	id UUID PRIMARY KEY,
+	order_id UUID NOT NULL,
+	customer_id VARCHAR(255) NOT NULL,
+	amount NUMERIC(12, 2) NOT NULL,
+	currency VARCHAR(3) NOT NULL,
+	status VARCHAR(32) NOT NULL,
+	failure_reason TEXT,
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	CONSTRAINT uq_payments_order_id UNIQUE (order_id)
+);

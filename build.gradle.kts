@@ -1,46 +1,39 @@
+import dev.detekt.gradle.extensions.DetektExtension
+import org.jlleitschuh.gradle.ktlint.KtlintExtension
+
 plugins {
-    kotlin("jvm") version "2.3.21"
-    kotlin("plugin.spring") version "2.3.21"
-    id("org.springframework.boot") version "4.1.1"
-    id("io.spring.dependency-management") version "1.1.7"
+	alias(libs.plugins.kotlin.jvm) apply false
+	alias(libs.plugins.kotlin.spring) apply false
+	alias(libs.plugins.spring.boot) apply false
+	alias(libs.plugins.spring.dependencyManagement) apply false
+	alias(libs.plugins.kotlin.jpa) apply false
+
+	alias(libs.plugins.detekt) apply false
+	alias(libs.plugins.ktlint) apply false
 }
 
-group = "com.example"
-version = "0.0.1-SNAPSHOT"
-description = "order-service"
+subprojects {
+	pluginManager.withPlugin(
+		rootProject.libs.plugins.ktlint
+			.get()
+			.pluginId,
+	) {
+		configure<KtlintExtension> {
+			android = false
+		}
+	}
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-}
+	pluginManager.withPlugin(
+		rootProject.libs.plugins.detekt
+			.get()
+			.pluginId,
+	) {
+		configure<DetektExtension> {
+			buildUponDefaultConfig = true
+		}
+	}
 
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-webmvc")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("tools.jackson.module:jackson-module-kotlin")
-    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-}
-
-kotlin {
-    compilerOptions {
-        freeCompilerArgs.addAll("-Xjsr305=strict", "-Xannotation-default-target=param-property")
-    }
-}
-
-allOpen {
-    annotation("jakarta.persistence.Entity")
-    annotation("jakarta.persistence.MappedSuperclass")
-    annotation("jakarta.persistence.Embeddable")
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform()
+	tasks.withType<Test>().configureEach {
+		useJUnitPlatform()
+	}
 }

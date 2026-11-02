@@ -38,3 +38,10 @@ out/
 
 ### Kotlin ###
 .kotlin
+
+# Environment & Secrets
+.env
+*.env.local
+.envrc
+
+skills/

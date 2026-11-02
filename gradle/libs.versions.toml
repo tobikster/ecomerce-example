@@ -1,0 +1,63 @@
+[versions]
+arrow = '2.3.0.1'
+detekt = '2.0.0-alpha.6'
+kotest = '5.9.1'
+kotest-arrow = '2.0.0'
+kotlin = '2.4.10'
+ktlint = '14.2.0'
+mockito-kotlin = '6.4.0'
+spring-boot = '4.1.1'
+spring-dependencyManagement = '1.1.7'
+testcontainers = '2.0.5'
+springdoc = '3.1.1'
+
+[libraries]
+# Spring Boot Starters
+spring-boot-starter-actuator = { module = 'org.springframework.boot:spring-boot-starter-actuator' }
+spring-boot-starter-flyway = { module = 'org.springframework.boot:spring-boot-starter-flyway' }
+spring-boot-starter-jpa = { module = 'org.springframework.boot:spring-boot-starter-data-jpa' }
+spring-boot-starter-web = { module = 'org.springframework.boot:spring-boot-starter-webmvc' }
+spring-boot-starter-validation = { module = 'org.springframework.boot:spring-boot-starter-validation' }
+spring-boot-starter-kafka = { module = 'org.springframework.boot:spring-boot-starter-kafka' }
+
+# Database
+flyway-postgresql = { module = 'org.flywaydb:flyway-database-postgresql' }
+postgresql = { module = 'org.postgresql:postgresql' }
+
+# Kotlin
+jackson-kotlin = { module = 'tools.jackson.module:jackson-module-kotlin' }
+kotlin-reflect = { module = 'org.jetbrains.kotlin:kotlin-reflect' }
+
+# Utils
+arrow = { module = 'io.arrow-kt:arrow-core', version.ref = 'arrow' }
+
+# Testing
+junit-platform-launcher = { module = 'org.junit.platform:junit-platform-launcher' }
+kotest-assertions = { module = 'io.kotest:kotest-assertions-core', version.ref = 'kotest' }
+kotest-arrow-matchers = { module = 'io.kotest.extensions:kotest-assertions-arrow', version.ref = 'kotest-arrow' }
+kotlin-junit5 = { module = 'org.jetbrains.kotlin:kotlin-test-junit5' }
+spring-boot-starter-test = { module = 'org.springframework.boot:spring-boot-starter-test' }
+spring-boot-starter-data-jpa-test = { module = 'org.springframework.boot:spring-boot-starter-data-jpa-test' }
+spring-boot-starter-webmvc-test = { module = 'org.springframework.boot:spring-boot-starter-webmvc-test' }
+spring-boot-testcontainers = { module = 'org.springframework.boot:spring-boot-testcontainers' }
+spring-kafka-test = { module = 'org.springframework.kafka:spring-kafka-test' }
+testcontainers-bom = { module = 'org.testcontainers:testcontainers-bom', version.ref = 'testcontainers' }
+testcontainers-postgresql = { module = 'org.testcontainers:testcontainers-postgresql' }
+testcontainers-kafka = { module = 'org.testcontainers:testcontainers-kafka' }
+testcontainers-junit = { module = 'org.testcontainers:testcontainers-junit-jupiter' }
+mockito-kotlin = { module = 'org.mockito.kotlin:mockito-kotlin', version.ref = 'mockito-kotlin' }
+
+# Documentation
+springdoc-openapi-webmvc-ui = { module = 'org.springdoc:springdoc-openapi-starter-webmvc-ui', version.ref = 'springdoc' }
+
+[plugins]
+detekt = { id = 'dev.detekt', version.ref = 'detekt' }
+ktlint = { id = 'org.jlleitschuh.gradle.ktlint', version.ref = 'ktlint' }
+
+kotlin-jpa = { id = 'org.jetbrains.kotlin.plugin.jpa', version.ref = 'kotlin' }
+kotlin-jvm = { id = 'org.jetbrains.kotlin.jvm', version.ref = 'kotlin' }
+kotlin-spring = { id = 'org.jetbrains.kotlin.plugin.spring', version.ref = 'kotlin' }
+
+spring-boot = { id = 'org.springframework.boot', version.ref = 'spring-boot' }
+
+spring-dependencyManagement = { id = 'io.spring.dependency-management', version.ref = 'spring-dependencyManagement' }

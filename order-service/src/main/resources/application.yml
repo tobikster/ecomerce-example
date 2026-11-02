@@ -1,0 +1,58 @@
+spring:
+    application:
+        name: order-service
+
+    datasource:
+        url: jdbc:postgresql://${DB_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB_ORDERS:orders_db}
+        username: ${POSTGRES_USER:postgres}
+        password: ${POSTGRES_PASSWORD:password}
+        driver-class-name: org.postgresql.Driver
+        hikari:
+            pool-name: OrdersHikariPool
+            maximum-pool-size: 10
+            minimum-idle: 2
+
+    jpa:
+        open-in-view: false
+        hibernate:
+            ddl-auto: validate
+        properties:
+            hibernate:
+                format_sql: true
+        show-sql: true
+
+    flyway:
+        enabled: true
+        baseline-on-migrate: true
+        locations: classpath:db/migration
+
+    kafka:
+        bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9094}
+        consumer:
+            group-id: order-service-group
+            auto-offset-reset: earliest
+            key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+            value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        producer:
+            key-serializer: org.apache.kafka.common.serialization.StringSerializer
+            value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+    web:
+        locale: en
+
+server:
+    port: 8080
+
+management:
+    endpoints:
+        web:
+            exposure:
+                include: health,info,metrics
+
+    endpoint:
+        health:
+            show-details: always
+
+springdoc:
+    default-produces-media-type: application/json
+    default-consumes-media-type: application/json

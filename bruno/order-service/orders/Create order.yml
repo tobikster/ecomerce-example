@@ -1,0 +1,129 @@
+info:
+  name: Create order
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{BASE_URL_ORDERS}}/orders"
+  body:
+    type: json
+    data: |-
+      {
+        "customerId": "{{customer_id}}",
+        "amount": "{{amount}}",
+        "currencyCode": "{{currency_code}}"
+      }
+  auth: inherit
+
+runtime:
+  variables:
+    - name: customer_id
+      value: customer_456
+    - name: amount
+      value: "100.00"
+    - name: currency_code
+      value: PLN
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+examples:
+  - name: Successful create order
+    request:
+      url: "{{BASE_URL_ORDERS}}/orders"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "customerId": "{{customer_id}}",
+            "amount": "{{amount}}",
+            "currencyCode": "{{currency_code}}"
+          }
+    response:
+      status: 201
+      statusText: Created
+      headers:
+        - name: location
+          value: /orders/e0ced684-9529-438a-95d0-5096a83ade88
+        - name: content-type
+          value: application/json
+        - name: transfer-encoding
+          value: chunked
+        - name: date
+          value: Mon, 19 Oct 2026 19:58:37 GMT
+        - name: keep-alive
+          value: timeout=60
+        - name: connection
+          value: keep-alive
+      body:
+        type: json
+        data: |-
+          {
+            "id": "e0ced684-9529-438a-95d0-5096a83ade88",
+            "customerId": "cust_123",
+            "amount": 10.00,
+            "currencyCode": "PLN",
+            "status": "created",
+            "createdAt": "2026-10-19T19:58:36.887052Z",
+            "updatedAt": "2026-10-19T19:58:36.887052Z"
+          }
+  - name: Invalid amount
+    request:
+      url: "{{BASE_URL_ORDERS}}/orders"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "customerId": "{{customer_id}}",
+            "amount": "{{amount}}",
+            "currencyCode": "{{currency_code}}"
+          }
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: content-type
+          value: application/problem+json
+        - name: transfer-encoding
+          value: chunked
+        - name: date
+          value: Mon, 19 Oct 2026 21:19:11 GMT
+        - name: connection
+          value: close
+      body:
+        type: text
+        data: '{"detail":"Order amount must be positive, got -10.00","instance":"/orders","status":400,"title":"Bad Request"}'
+  - name: Empty customer id
+    request:
+      url: "{{BASE_URL_ORDERS}}/orders"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "customerId": "{{customer_id}}",
+            "amount": "{{amount}}",
+            "currencyCode": "{{currency_code}}"
+          }
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: content-type
+          value: application/problem+json
+        - name: transfer-encoding
+          value: chunked
+        - name: date
+          value: Mon, 19 Oct 2026 21:21:36 GMT
+        - name: connection
+          value: close
+      body:
+        type: text
+        data: '{"detail":"Validation failed for one or more fields","instance":"/orders","status":400,"title":"Bad Request","errors":{"customerId":"nie może być odstępem"}}'

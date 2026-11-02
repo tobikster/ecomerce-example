@@ -1,3 +1,8 @@
 [*]
 indent_style = tab
 ij_smart_tabs = true
+
+[*.{kt,kts}]
+ij_kotlin_name_count_to_use_star_import = 999
+ij_kotlin_name_count_to_use_star_import_for_members = 999
+ij_kotlin_packages_to_use_import_on_demand = unset
